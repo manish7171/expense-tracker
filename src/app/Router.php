@@ -11,17 +11,27 @@ class Router
 {
   private array $routes;
 
-  public function register(string $route, callable|array $action): self
+  public function register(string $requestMethod, string $route, callable|array $action): self
   {
-    $this->routes[$route] = $action;
+    $this->routes[$requestMethod][$route] = $action;
     return $this;
   }
 
-  public function resolve(string $requestUri)
+  public function get(string $route, callable|array $action): self
+  {
+    return $this->register('GET', $route, $action);
+  }
+
+  public function post(string $route, callable|array $action): self
+  {
+    return $this->register('POST', $route, $action);
+  }
+
+  public function resolve(string $requestUri, string $requestMethod)
   {
     $route = explode("?", $requestUri)[0];
 
-    $action = $this->routes[$route] ?? null;
+    $action = $this->routes[$requestMethod][$route] ?? null;
 
     if (!$action) {
       throw new RouteNotFoundException();
