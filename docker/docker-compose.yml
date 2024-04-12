@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   app:
     build:
@@ -20,3 +18,28 @@ services:
     volumes:
       - ../src:/var/www
       - ./nginx:/etc/nginx/conf.d/
+
+  db:
+    image: mysql:8.0
+    container_name: php_db
+    restart: always
+    volumes:
+      - "./storage/mysql:/var/lib/mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - 3306:3306
+
+  pma:
+    container_name: php_pma
+    image: phpmyadmin:5.1
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=php_db
+      - PMA_USER=root
+      - PMA_PASSWORD=root
+      - PMA_PORT=3306
+        # depends_on:
+        #- hotel.db
+    ports:
+      - 8888:80
