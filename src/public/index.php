@@ -5,6 +5,7 @@ require __DIR__ . "/../vendor/autoload.php";
 use App\Config;
 use App\Controllers\HomeController;
 use App\Controllers\InvoiceController;
+use App\Controllers\TransactionController;
 use Dotenv\Dotenv;
 use App\App;
 
@@ -24,8 +25,9 @@ $router
   ->post('/upload', [HomeController::class, 'upload'])
   ->get('/invoices', [InvoiceController::class, 'index'])
   ->get('/invoices/create', [InvoiceController::class, 'create'])
-  ->post('/invoices/create', [InvoiceController::class, 'store']);
-
+  ->post('/invoices/create', [InvoiceController::class, 'store'])
+  ->get('/transactions', [TransactionController::class, 'index'])
+  ->post('/transactions/upload', [TransactionController::class, 'upload']);
 (new App(
   $router,
   ['uri' => $_SERVER['REQUEST_URI'], 'method' => $_SERVER['REQUEST_METHOD']],

@@ -4,31 +4,32 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Models\SignUp;
 use App\View;
-use PDO;
+use App\Models\User;
+use App\Models\Invoice;
 
 class HomeController
 {
   public static function index(): View
   {
-    $dsn = "mysql:host=" . $_ENV['DB_HOST'] . ";dbname=" . $_ENV['DB_DATABASE'];
-    $username = $_ENV['DB_USER'];
-    $password = $_ENV['DB_PASS'];
-    try {
-      $db = new PDO($dsn, $username, $password, [
-        //PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ
-      ]);
-      $query = 'Select * from users';
-      foreach ($db->query($query) as $user) {
-        echo '<pre>';
-        var_dump($user);
-        echo '</pre>';
-      }
-    } catch (\PDOException $e) {
-      throw new \PDOException($e->getMessage(), $e->getCode());
-    }
-    var_dump($db);
-    return View::make('index', ["foo" => "bar"]);
+    $user = new User();
+    $invoice = new Invoice();
+    $email = "test5@test.com";
+    $name = "test4 test4";
+    $amount = 25;
+
+    $invoiceId = (new SignUp($user, $invoice))->register(
+      [
+        "email" => $email,
+        "name" => $name
+      ],
+      [
+        "amount" => $amount
+      ]
+    );
+
+    return View::make('index', ["invoice" => $invoice->find($invoiceId)]);
   }
 
   public function upload()
