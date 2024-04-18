@@ -2,9 +2,11 @@
 
 require __DIR__ . "/../vendor/autoload.php";
 
+use App\Config;
 use App\Controllers\HomeController;
 use App\Controllers\InvoiceController;
 use Dotenv\Dotenv;
+use App\App;
 
 $dotenv = Dotenv::createImmutable(dirname(__DIR__));
 
@@ -24,4 +26,9 @@ $router
   ->get('/invoices/create', [InvoiceController::class, 'create'])
   ->post('/invoices/create', [InvoiceController::class, 'store']);
 
-(new \App\App($router, ['uri' => $_SERVER['REQUEST_URI'], 'method' => $_SERVER['REQUEST_METHOD']]))->run();
+(new App(
+  $router,
+  ['uri' => $_SERVER['REQUEST_URI'], 'method' => $_SERVER['REQUEST_METHOD']],
+  new Config($_ENV)
+))
+  ->run();
