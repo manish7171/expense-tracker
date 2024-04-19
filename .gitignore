@@ -1,3 +1,5 @@
 src/vendor/
 docker/storage
 .env
+src/.phpunit.result.cache
+src/.phpunit.cache/
