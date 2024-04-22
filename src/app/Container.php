@@ -18,12 +18,16 @@ class Container implements ContainerInterface
   {
     if ($this->has($id)) {
       $entry = $this->entries[$id];
+
+      if (is_callable($entry)) {
+        return $entry($this);
+      }
+      $id = $entry;
       //NOTE: $entry is a callable here
       //NOTE: $entry() will return the returning value of the callback
       //NOTE: in $entry($this), i am passing the current instance of the Container as the argument
       //NOTE: this way the callback function has the access to the container,
       //NOTE: so it could get its own dependencies if needed within that callback
-      return $entry($this);
     }
 
     return $this->resolve($id);
@@ -34,7 +38,7 @@ class Container implements ContainerInterface
     return isset($this->entries[$id]);
   }
 
-  public function set(string $id, callable $concrete): void
+  public function set(string $id, callable|string $concrete): void
   {
     $this->entries[$id] = $concrete;
   }
