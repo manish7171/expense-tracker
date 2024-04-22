@@ -8,11 +8,16 @@ use App\Models\SignUp;
 use App\View;
 use App\Models\User;
 use App\Models\Invoice;
+use App\Services\InvoiceService;
+use App\App;
 
 class HomeController
 {
   public static function index(): View
   {
+    App::$container->get(InvoiceService::class)->process([], 25);
+
+    die;
     $user = new User();
     $invoice = new Invoice();
     $email = "test5@test.com";
