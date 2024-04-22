@@ -17,8 +17,8 @@ session_start();
 
 define('STORAGE_PATH', __DIR__ . '/../storage');
 define('VIEW_PATH', __DIR__ . '/../views');
-
-$router = new \App\Router();
+$container = new \App\Container();
+$router = new \App\Router($container);
 
 $router
   ->get('/', [HomeController::class, 'index'])

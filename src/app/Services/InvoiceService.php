@@ -15,6 +15,7 @@ class InvoiceService
 
   public function process(array $customer, float $amount): bool
   {
+    //var_dump('processing');
     // 1. calculate sales tax
     $tax = $this->salesTaxService->calculate($amount, $customer);
 

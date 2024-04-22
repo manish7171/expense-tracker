@@ -9,13 +9,16 @@ use App\View;
 use App\Models\User;
 use App\Models\Invoice;
 use App\Services\InvoiceService;
-use App\App;
+use App\Container;
 
 class HomeController
 {
-  public static function index(): View
+  public function __construct(private InvoiceService $invoiceService)
   {
-    App::$container->get(InvoiceService::class)->process([], 25);
+  }
+  public function index(): View
+  {
+    $this->invoiceService->process([], 25);
 
     die;
     $user = new User();
