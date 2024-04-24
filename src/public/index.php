@@ -6,6 +6,7 @@ use App\Config;
 use App\Controllers\HomeController;
 use App\Controllers\InvoiceController;
 use App\Controllers\TransactionController;
+use App\Controllers\UserController;
 use Dotenv\Dotenv;
 use App\App;
 
@@ -18,13 +19,14 @@ session_start();
 define('STORAGE_PATH', __DIR__ . '/../storage');
 define('VIEW_PATH', __DIR__ . '/../views');
 $container = new \App\Container();
-//$route = new Route();
 $router = new \App\Router($container);
 $router->registerRoutesFromControllerAttributes([
   HomeController::class,
   InvoiceController::class,
-  TransactionController::class
+  TransactionController::class,
+  UserController::class
 ]);
+
 
 
 // $router

@@ -43,3 +43,12 @@ services:
         #- hotel.db
     ports:
       - 8888:80
+  mailhog:
+    container_name: php_mailhog
+    image: mailhog/mailhog
+    restart: always
+    logging:
+      driver: none
+    ports:
+      - 8025:8025
+      - 1025:1025
