@@ -23,6 +23,21 @@ class Invoice extends Model
 {
   const UPDATED_AT = null;
 
+  protected $casts = [
+    'created_at' => 'datetime',
+    'due_date' => 'datetime',
+    'status' => InvoiceStatus::class,
+  ];
+
+  public static function booted()
+  {
+    static::creating(function (Invoice $invoice) {
+      if ($invoice->isClean('due_date')) {
+        $invoice->due_date = (new \Carbon\Carbon())->addDays(10);
+      }
+    });
+  }
+
   public function items(): HasMany
   {
     return $this->hasMany(InvoiceItem::class);

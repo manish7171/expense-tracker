@@ -7,6 +7,7 @@ namespace App;
 use App\Exceptions\RouteNotFoundException;
 use App\Exceptions\MethodNotFoundException;
 use App\Attributes\Route;
+use Illuminate\Container\Container;
 
 class Router
 {
