@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace App;
 
 use App\Contracts\EmailValidationInterface;
-use App\Services\AbstractEmailApi\EmailValidationService;
+//use App\Services\AbstractEmailApi\EmailValidationService;
+use App\Services\Emaillable\EmailValidationService;
 use Dotenv\Dotenv;
 use Illuminate\Events\Dispatcher;
 use App\Services\PaymentGatewayService;
 use App\Services\PaymentGatewayServiceInterface;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Container\Container;
+use Twig\Environment;
 
 class App
 {
@@ -38,10 +40,17 @@ class App
 
     $this->config = new Config($_ENV);
 
+    $loader = new \Twig\Loader\FilesystemLoader(VIEW_PATH);
+    $twig = new \Twig\Environment($loader, [
+      'cache' => STORAGE_PATH . '/cache',
+      'auto_reload' => true
+    ]);
+
     $this->initDb($this->config->db);
+    $this->container->singleton(Environment::class, (fn () => $twig));
     $this->container->bind(PaymentGatewayServiceInterface::class, PaymentGatewayService::class);
-    //$this->container->bind(EmailValidationInterface::class, fn () => new EmailValidationService($this->config->apiKeys['emailable']));
-    $this->container->bind(EmailValidationInterface::class, fn () => new EmailValidationService($this->config->apiKeys['abstract']));
+    $this->container->bind(EmailValidationInterface::class, fn () => new EmailValidationService($this->config->apiKeys['emailable']));
+    //$this->container->bind(EmailValidationInterface::class, fn () => new EmailValidationService($this->config->apiKeys['abstract']));
     //$this->container->set(PaymentGatewayServiceInterface::class, fn (Container $c) => $c->get(PaymentGatewayService::class));
 
     return $this;

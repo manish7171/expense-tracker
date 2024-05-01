@@ -12,17 +12,20 @@ use App\Services\InvoiceService;
 use App\Models\User;
 use App\Attributes\Get;
 use App\Attributes\Post;
+use Twig\Environment;
 
 class InvoiceController
 {
-  public function __construct(private InvoiceService $invoiceService)
+  public function __construct(private InvoiceService $invoiceService, private Environment $twig)
   {
   }
 
   #[Get('/invoices')]
-  public function index(): View
+  public function index(): string
   {
-    $invoice = Invoice::query()->where('status', InvoiceStatus::Paid)->get()->toArray();
+    xdebug_info();
+    throw new \Exception('exception');
+    $invoices = Invoice::query()->where('status', InvoiceStatus::Paid)->get()->toArray();
     // $this->invoiceService->process([], 25);
     //
     // $user = new User();
@@ -41,7 +44,8 @@ class InvoiceController
     //   ]
     // );
     //
-    return View::make('/invoice/index', ["invoice" => $invoice]);
+    //return View::make('/invoice/index', ["invoice" => $invoice]);
+    return $this->twig->render('/invoice/index.twig', ["invoices" => $invoices]);
   }
   #[Get('/invoices/new')]
   public function create(): View
