@@ -23,8 +23,6 @@ class InvoiceController
   #[Get('/invoices')]
   public function index(): string
   {
-    xdebug_info();
-    throw new \Exception('exception');
     $invoices = Invoice::query()->where('status', InvoiceStatus::Paid)->get()->toArray();
     // $this->invoiceService->process([], 25);
     //

@@ -7,13 +7,17 @@ namespace App\Controllers;
 use App\Attributes\Get;
 use App\Attributes\Post;
 use App\View;
+use Twig\Environment;
 
 class HomeController
 {
 
-  #[Get('/')]
-  public function index(): View
+  public function __construct(private Environment $twig)
   {
-    return View::make('index');
+  }
+  #[Get('/')]
+  public function index(): string
+  {
+    return $this->twig->render('dashboard.twig');
   }
 }

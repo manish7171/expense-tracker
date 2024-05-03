@@ -17,9 +17,9 @@ $dotenv = Dotenv::createImmutable(dirname(__DIR__));
 $dotenv->load();
 
 session_start();
-
-define('STORAGE_PATH', __DIR__ . '/../storage');
-define('VIEW_PATH', __DIR__ . '/../views');
+require __DIR__ . '/../configs/path_constants.php';
+#define('STORAGE_PATH', __DIR__ . '/../storage');
+#define('VIEW_PATH', __DIR__ . '/../views');
 //$container = new \App\Container();
 $container = new Container();
 $router = new \App\Router($container);
@@ -32,15 +32,6 @@ $router->registerRoutesFromControllerAttributes([
 ]);
 
 
-
-// $router
-//   ->get('/', [HomeController::class, 'index'])
-//   ->post('/upload', [HomeController::class, 'upload'])
-//   ->get('/invoices', [InvoiceController::class, 'index'])
-//   ->get('/invoices/create', [InvoiceController::class, 'create'])
-//   ->post('/invoices/create', [InvoiceController::class, 'store'])
-//   ->get('/transactions', [TransactionController::class, 'index'])
-//   ->post('/transactions/upload', [TransactionController::class, 'upload']);
 (new App(
   $container,
   $router,

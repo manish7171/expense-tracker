@@ -33,11 +33,12 @@ class Config
         'emailable' => $env['EMAILABLE_API_KEY'] ?? '',
         'abstract' => $env['ABSTRACT_API_KEY'] ?? ''
       ],
+      'environment' => $env['APP_ENVIRONMENT'] ?? 'production'
     ];
   }
 
-  public function __get(string $name): array
+  public function __get(string $name): string|array
   {
-    return $this->config[$name] ?? [];
+    return $this->config[$name] ?? null;
   }
 }

@@ -3,3 +3,4 @@ docker/storage
 .env
 src/.phpunit.result.cache
 src/.phpunit.cache/
+src/storage/cache/c4

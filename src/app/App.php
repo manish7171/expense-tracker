@@ -13,6 +13,8 @@ use App\Services\PaymentGatewayService;
 use App\Services\PaymentGatewayServiceInterface;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Container\Container;
+use Symfony\Bridge\Twig\Extension\AssetExtension;
+use Symfony\WebpackEncoreBundle\Twig\EntryFilesTwigExtension;
 use Twig\Environment;
 
 class App
@@ -43,8 +45,11 @@ class App
     $loader = new \Twig\Loader\FilesystemLoader(VIEW_PATH);
     $twig = new \Twig\Environment($loader, [
       'cache' => STORAGE_PATH . '/cache',
-      'auto_reload' => true
+      'auto_reload' => $this->config->environment === 'development'
     ]);
+
+    $twig->addExtension(new EntryFilesTwigExtension($this->container));
+    //$twig->addExtension(new AssetExtension($this->container->get('webpack_encore.packages')));
 
     $this->initDb($this->config->db);
     $this->container->singleton(Environment::class, (fn () => $twig));
