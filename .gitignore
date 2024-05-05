@@ -1,6 +1,7 @@
 src/vendor/
+src/node_modules/
 docker/storage
 .env
 src/.phpunit.result.cache
 src/.phpunit.cache/
-src/storage/cache/c4
+src/storage/cache/

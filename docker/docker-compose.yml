@@ -4,12 +4,19 @@ services:
       context: ./
       dockerfile: Dockerfile
     container_name: php_app
+    args:
+      USER_ID: "${WWWUSER:-1000}"
+      GROUP_ID: "${WWWGROUP:-1000}"
+      USER: "${USER:-whoami}"
     restart: always
     working_dir: /var/www/
     extra_hosts:
       - host.docker.internal:host-gateway
+    ports:
+      - "9003:9003"
     volumes:
       - ../src:/var/www
+      - ./local.ini:/usr/local/etc/php/conf.d/local.ini
 
   nginx:
     image: nginx:alpine

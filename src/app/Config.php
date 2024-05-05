@@ -16,16 +16,27 @@ class Config
    * */
   public function __construct(array $env)
   {
+    //Doctrine config
     $params = [
-      'host' => $env['DB_HOST'],
-      'username' => $env['DB_USER'],
-      'password' => $env['DB_PASS'],
-      'database' => $env['DB_DATABASE'],
-      'driver' => $env['DB_DRIVER'] ?? 'mysql',
-      'charset' => 'utf8',
-      'collation' => 'utf8_unicode_ci',
-      'prefix' => '',
+      'host' => $_ENV['DB_HOST'],
+      'user' => $_ENV['DB_USER'],
+      'password' => $_ENV['DB_PASS'],
+      'dbname' => $_ENV['DB_DATABASE'],
+      'driver' => $_ENV['DB_DRIVER'] ?? 'pdo_mysql',
     ];
+
+
+    //laravel db config
+    // $params = [
+    //   'host' => $env['DB_HOST'],
+    //   'username' => $env['DB_USER'],
+    //   'password' => $env['DB_PASS'],
+    //   'database' => $env['DB_DATABASE'],
+    //   'driver' => $env['DB_DRIVER'] ?? 'mysql',
+    //   'charset' => 'utf8',
+    //   'collation' => 'utf8_unicode_ci',
+    //   'prefix' => '',
+    // ];
 
     $this->config = [
       'db' => $params,

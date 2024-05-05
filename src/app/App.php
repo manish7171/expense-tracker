@@ -7,13 +7,15 @@ namespace App;
 use App\Contracts\EmailValidationInterface;
 //use App\Services\AbstractEmailApi\EmailValidationService;
 use App\Services\Emaillable\EmailValidationService;
+use Doctrine\ORM\ORMSetup;
+use Doctrine\ORM\EntityManager;
+use Doctrine\DBAL\DriverManager;
 use Dotenv\Dotenv;
 use Illuminate\Events\Dispatcher;
 use App\Services\PaymentGatewayService;
 use App\Services\PaymentGatewayServiceInterface;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Container\Container;
-use Symfony\Bridge\Twig\Extension\AssetExtension;
 use Symfony\WebpackEncoreBundle\Twig\EntryFilesTwigExtension;
 use Twig\Environment;
 
@@ -52,7 +54,15 @@ class App
     //$twig->addExtension(new AssetExtension($this->container->get('webpack_encore.packages')));
 
     $this->initDb($this->config->db);
+
+    $config = ORMSetup::createAttributeMetadataConfiguration(
+      paths: array(__DIR__ . "/Entities"),
+      isDevMode: true,
+    );
+    $connection = DriverManager::getConnection($this->config->db, $config);
+
     $this->container->singleton(Environment::class, (fn () => $twig));
+    $this->container->singleton(EntityManager::class, (fn () => new EntityManager($connection, $config)));
     $this->container->bind(PaymentGatewayServiceInterface::class, PaymentGatewayService::class);
     $this->container->bind(EmailValidationInterface::class, fn () => new EmailValidationService($this->config->apiKeys['emailable']));
     //$this->container->bind(EmailValidationInterface::class, fn () => new EmailValidationService($this->config->apiKeys['abstract']));

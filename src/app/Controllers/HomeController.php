@@ -15,6 +15,7 @@ class HomeController
   public function __construct(private Environment $twig)
   {
   }
+
   #[Get('/')]
   public function index(): string
   {

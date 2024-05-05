@@ -10,7 +10,9 @@
     "illuminate/database": "^11.5",
     "illuminate/events": "^11.5",
     "guzzlehttp/guzzle": "^7.8",
-    "twig/twig": "^3.9"
+    "twig/twig": "^3.9",
+    "symfony/twig-bridge": "^7.0",
+    "symfony/webpack-encore-bundle": "^2.1"
   },
   "autoload": {
     "psr-4": {

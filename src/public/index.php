@@ -3,6 +3,7 @@
 require __DIR__ . "/../vendor/autoload.php";
 
 use App\Config;
+use App\Controllers\AuthController;
 use App\Controllers\HomeController;
 use App\Controllers\InvoiceController;
 use App\Controllers\TransactionController;
@@ -25,6 +26,7 @@ $container = new Container();
 $router = new \App\Router($container);
 $router->registerRoutesFromControllerAttributes([
   HomeController::class,
+  AuthController::class,
   InvoiceController::class,
   TransactionController::class,
   UserController::class,
