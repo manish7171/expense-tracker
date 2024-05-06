@@ -1,5 +1,3 @@
-# expense-tracker-with-vanilla-php
+# Expense tracker
 
-I got bored and started this project.
-Goal is to create an app without any framework.
-
+Goal is to create an Expense Tracking app Slim php framework.

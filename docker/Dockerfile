@@ -5,12 +5,14 @@ ARG USER_ID
 ARG GROUP_ID
 
 RUN apt-get update && apt-get install -y \
-  git \
-  curl \
-  zip \
-  unzip
+    curl \
+    zip \
+    vim \
+    unzip \
+    libicu-dev
 
-RUN docker-php-ext-install pdo pdo_mysql
+RUN docker-php-ext-configure intl
+RUN docker-php-ext-install pdo pdo_mysql intl
 
 RUN pecl install xdebug \ 
    && docker-php-ext-enable xdebug

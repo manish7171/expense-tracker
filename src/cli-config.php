@@ -26,7 +26,7 @@ $params = [
 
 $config = new PhpFile('migrations.php'); // Or use one of the Doctrine\Migrations\Configuration\Configuration\* loaders
 
-$paths = [__DIR__ . '/app/Entities'];
+$paths = [__DIR__ . '/app/Entity'];
 $isDevMode = true;
 
 $ORMConfig = ORMSetup::createAttributeMetadataConfiguration($paths, $isDevMode);
