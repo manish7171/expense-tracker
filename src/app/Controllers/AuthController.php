@@ -7,10 +7,10 @@ namespace App\Controllers;
 use App\Attributes\Get;
 use App\Attributes\Post;
 use App\Entities\User;
+use App\Exceptions\ValidationException;
 use Twig\Environment;
-use Doctrine\ORM\ORMSetup;
 use Doctrine\ORM\EntityManager;
-use Doctrine\DBAL\DriverManager;
+use Valitron\Validator;
 
 class AuthController
 {
@@ -28,7 +28,10 @@ class AuthController
   #[Get('/register')]
   public function registerView(): string
   {
-    return $this->twig->render('auth/register.twig');
+    $errors = $_SESSION['errors'] ?? [];
+    $old = $_SESSION['old'] ?? [];
+    unset($_SESSION['errors']);
+    return $this->twig->render('auth/register.twig', ['errors' => $errors, 'old' => $old]);
   }
 
   #[Post('/register')]
@@ -44,5 +47,7 @@ class AuthController
 
     $this->em->persist($user);
     $this->em->flush();
+
+    //TODO: redirect to login page
   }
 }

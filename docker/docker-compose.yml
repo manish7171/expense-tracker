@@ -3,11 +3,11 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
+      args:
+        USER_ID: "${WWWUSER:-1000}"
+        GROUP_ID: "${WWWGROUP:-1000}"
+        USER: "${USER:-whoami}"
     container_name: php_app
-    args:
-      USER_ID: "${WWWUSER:-1000}"
-      GROUP_ID: "${WWWGROUP:-1000}"
-      USER: "${USER:-whoami}"
     restart: always
     working_dir: /var/www/
     extra_hosts:
