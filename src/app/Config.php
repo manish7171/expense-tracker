@@ -39,6 +39,8 @@ class Config
     // ];
 
     $this->config = [
+      'appName' => $env['APP_NAME'] ?? 'My APP',
+      'appVersion' => $env['APP_VERSION'] ?? '1.0',
       'db' => $params,
       'apiKeys' => [
         'emailable' => $env['EMAILABLE_API_KEY'] ?? '',
