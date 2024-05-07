@@ -11,11 +11,12 @@ use Slim\Views\Twig;
 
 class HomeController
 {
-
+  public function __construct(private readonly Twig $twig)
+  {
+  }
 
   public function index(Request $request, Response $response, $args): Response
   {
-    $view = Twig::fromRequest($request);
-    return $view->render($response, 'index.twig');
+    return $this->twig->render($response, 'index.twig');
   }
 }
