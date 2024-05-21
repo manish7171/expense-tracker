@@ -5,7 +5,7 @@ use Slim\Views\TwigMiddleware;
 
 $app = require __DIR__ . "/../bootstrap.php";
 $container = $app->getContainer();
-$router = require CONFIG_PATH . "/router.php";
+$router = require CONFIG_PATH . "/routes/web.php";
 $router($app);
 // Add Twig-View Middleware
 $app->add(TwigMiddleware::create($app, $container->get(Twig::class)));

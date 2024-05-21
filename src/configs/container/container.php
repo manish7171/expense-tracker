@@ -7,7 +7,9 @@ use DI\ContainerBuilder;
 
 // Create Container using PHP-DI
 $container = new Container();
+
 $containerBuilder = new ContainerBuilder();
-$containerBuilder->addDefinitions(__DIR__ . "/../configs/container_bindings.php");
+
+$containerBuilder->addDefinitions(__DIR__ . "/container_bindings.php");
 
 return $containerBuilder->build();
