@@ -9,10 +9,11 @@ use Doctrine\ORM\EntityManager;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Views\Twig;
+use Valitron\Validator;
 
 class AuthController
 {
-  public function __construct(private readonly Twig $twig, private readonly EntityManager $entityManager)
+  public function __construct(private readonly Twig $twig, private readonly EntityManager $em)
   {
   }
 
@@ -28,8 +29,7 @@ class AuthController
 
   public function register(Request $request, Response $response): Response
   {
-    $data = $_POST;
-    $data = $_POST;
+    $data = $request->getParsedBody();
     $v = new Validator($data);
     $v->rule('required', ['name', 'email', 'password', 'confirmPassword']);
     $v->rule('email', 'email');
@@ -46,8 +46,6 @@ class AuthController
       //throw new ValidationException($v->errors());
     }
 
-
-    $data = $request->getParsedBody();
 
     $user = new User();
 
