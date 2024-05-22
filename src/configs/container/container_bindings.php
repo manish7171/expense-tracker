@@ -31,7 +31,6 @@ return [
     $connection = DriverManager::getConnection($config->get('doctrine.connection'), $setup);
     return new EntityManager($connection, $setup);
   },
-
   Twig::class                    => function (Config $config,  ContainerInterface $container) {
     $twig = Twig::create(VIEW_PATH, [
       'cache' => STORAGE_PATH . '/cache',
@@ -40,7 +39,7 @@ return [
 
     $twig->addExtension(new IntlExtension());
     $twig->addExtension(new EntryFilesTwigExtension($container));
-    $twig->addExtension(new AssetExtension($container->get('webpack_encore.packages')));
+    //$twig->addExtension(new AssetExtension($container->get('webpack_encore.packages')));
     return $twig;
   },
   /**
