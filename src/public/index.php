@@ -1,13 +1,7 @@
 <?php
 
-use Slim\Views\Twig;
-use Slim\Views\TwigMiddleware;
+use Slim\App;
 
-$app = require __DIR__ . "/../bootstrap.php";
-$container = $app->getContainer();
-$router = require CONFIG_PATH . "/routes/web.php";
-$router($app);
-// Add Twig-View Middleware
-$app->add(TwigMiddleware::create($app, $container->get(Twig::class)));
+$container = require __DIR__ . "/../bootstrap.php";
 
-$app->run();
+$container->get(App::class)->run();

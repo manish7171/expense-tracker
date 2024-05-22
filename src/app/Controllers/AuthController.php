@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Entity\User;
+use App\Exceptions\ValidationException;
 use Doctrine\ORM\EntityManager;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -13,7 +14,7 @@ use Valitron\Validator;
 
 class AuthController
 {
-  public function __construct(private readonly Twig $twig, private readonly EntityManager $em)
+  public function __construct(private readonly Twig $twig, private readonly EntityManager $entityManager)
   {
   }
 
@@ -30,22 +31,24 @@ class AuthController
   public function register(Request $request, Response $response): Response
   {
     $data = $request->getParsedBody();
+
     $v = new Validator($data);
+
     $v->rule('required', ['name', 'email', 'password', 'confirmPassword']);
     $v->rule('email', 'email');
-    $v->rule('equals', 'confirmPassword', 'password')->label('Confirm password');
-    $v->rule(function ($field, $value, $params, $fields) {
-      return !$this->em->getRepository(User::class)->count(['email' => $value]);
-    }, "email")->message("User with given email address already exists");
+    $v->rule('equals', 'confirmPassword', 'password')->label('Confirm Password');
+    $v->rule(
+      fn ($field, $value, $params, $fields) => !$this->entityManager->getRepository(User::class)->count(
+        ['email' => $value]
+      ),
+      'email'
+    )->message('User with the given email address already exists');
 
-    if (!$v->validate()) {
-      $_SESSION['errors'] = $v->errors();
-      $sensitiveFields = ['password', 'confirmPassword'];
-      $_SESSION['old'] = array_diff_key($_POST, array_flip($sensitiveFields));
-      header("location:/register");
-      //throw new ValidationException($v->errors());
+    if ($v->validate()) {
+      echo "Yay! We're all good!";
+    } else {
+      throw new ValidationException($v->errors());
     }
-
 
     $user = new User();
 

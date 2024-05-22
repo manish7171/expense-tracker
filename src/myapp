@@ -1,42 +1,33 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 use App\Config;
-use App\Commands\MyCommand;
+use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
+use Doctrine\Migrations\Configuration\Migration\PhpFile;
+use Doctrine\Migrations\DependencyFactory;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Console\ConsoleRunner;
 use Doctrine\ORM\Tools\Console\EntityManagerProvider\SingleManagerProvider;
-
 use Symfony\Component\Console\Application;
 
-use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
-use Doctrine\Migrations\DependencyFactory;
-use Doctrine\Migrations\Configuration\Migration\PhpFile;
-// replace with path to your own project bootstrap file
-$app = require "bootstrap.php";
-$container = $app->getContainer();
+$container = require 'bootstrap.php';
+$config    = $container->get(Config::class);
 
-// replace with mechanism to retrieve EntityManager in your app
-$entityManager = $container->get(EntityManager::class);
-$appConfig = $container->get(Config::class);
-$config = new PhpFile(CONFIG_PATH . '/migrations.php'); // Or use one of the Doctrine\Migrations\Configuration\Configuration\* loaders
-$dependencyFactory = DependencyFactory::fromEntityManager($config, new ExistingEntityManager($entityManager));
+$entityManager     = $container->get(EntityManager::class);
+$dependencyFactory = DependencyFactory::fromEntityManager(
+    new PhpFile(CONFIG_PATH . '/migrations.php'),
+    new ExistingEntityManager($entityManager)
+);
 
 $migrationCommands = require CONFIG_PATH . '/commands/migration_commands.php';
-$customCommand = require CONFIG_PATH . '/commands/commands.php';
+$customCommands    = require CONFIG_PATH . '/commands/commands.php';
 
-$commands = [
-  // If you want to add your own custom console commands,
-  // you can do so here.
-  $container->get(MyCommand::class)
-];
+$cliApp = new Application($config->get('app_name'), $config->get('app_version'));
 
-$application = new Application($appConfig->get('app_name'), $appConfig->get('app_version'));
+ConsoleRunner::addCommands($cliApp, new SingleManagerProvider($entityManager));
 
-ConsoleRunner::addCommands($application, new SingleManagerProvider($entityManager));
+$cliApp->addCommands($migrationCommands($dependencyFactory));
+$cliApp->addCommands(array_map(fn($command) => $container->get($command), $customCommands));
 
-$application->addCommands($migrationCommands($dependencyFactory));
-$application->addCommands(array_map(fn ($command) => $container->get($command), $customCommand));
-
-$application->run();
+$cliApp->run();
