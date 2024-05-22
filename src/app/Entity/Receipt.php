@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Entities;
+namespace App\Entity;
 
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
