@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Auth;
 use App\Config;
+use App\Contracts\AuthInterface;
 use App\Enums\AppEnvironment;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
@@ -70,4 +72,5 @@ return [
     $container->get('webpack_encore.packages')
   ),
   ResponseFactoryInterface::class => fn (App $app) => $app->getResponseFactory(),
+  AuthInterface::class => fn (ContainerInterface $container) => $container->get(Auth::class),
 ];

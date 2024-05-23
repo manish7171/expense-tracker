@@ -44,9 +44,7 @@ class AuthController
       'email'
     )->message('User with the given email address already exists');
 
-    if ($v->validate()) {
-      echo "Yay! We're all good!";
-    } else {
+    if (!$v->validate()) {
       throw new ValidationException($v->errors());
     }
 
@@ -60,5 +58,38 @@ class AuthController
     $this->entityManager->flush();
 
     return $response;
+  }
+
+  public function logIn(Request $request, Response $response): Response
+  {
+    $data = $request->getParsedBody();
+    $v = new Validator($data);
+
+    $v->rule('required', ['email', 'password']);
+    $v->rule('email', 'email');
+
+    if (!$v->validate()) {
+      throw new ValidationException($v->errors());
+    }
+
+    $user = $this->entityManager->getRepository(User::class)->findOneBy(["email" => $data['email']]);
+
+    if (!$user || !password_verify($data['password'], $user->getPassword())) {
+      throw new ValidationException(["password" => ["Invalid password or email"]]);
+    }
+
+    session_regenerate_id();
+
+    $_SESSION['user'] = $user->getId();
+
+
+    return $response->withHeader('Location', '/')->withStatus(302);
+  }
+
+  public function logOut(Request $request, Response $response): Response
+  {
+    // TODO
+
+    return $response->withHeader('Location', '/')->withStatus(302);
   }
 }

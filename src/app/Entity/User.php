@@ -17,9 +17,11 @@ use Doctrine\ORM\Mapping\PreUpdate;
 use Doctrine\ORM\Mapping\Table;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 
+use App\Contracts\UserInterface;
+
 #[Entity, Table('users')]
 #[HasLifecycleCallbacks]
-class User
+class User implements UserInterface
 {
   #[Id, Column(options: ['unsigned' => true]), GeneratedValue]
   private int $id;
