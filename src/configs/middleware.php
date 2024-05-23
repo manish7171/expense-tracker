@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
-use App\Config;
-use App\Middleware\ValidationExceptionMiddleware;
+use App\Middleware\OldFormDataMiddleware;
 use Slim\App;
+use App\Config;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
+use App\Middleware\StartSessionMiddleware;
+use App\Middleware\ValidationErrorsMiddleware;
+use App\Middleware\ValidationExceptionMiddleware;
 
 return function (App $app) {
   $container = $app->getContainer();
@@ -14,7 +17,11 @@ return function (App $app) {
 
   // Twig
   $app->add(TwigMiddleware::create($app, $container->get(Twig::class)));
+
   $app->add(ValidationExceptionMiddleware::class);
+  $app->add(ValidationErrorsMiddleware::class);
+  $app->add(OldFormDataMiddleware::class);
+  $app->add(StartSessionMiddleware::class);
 
   // Logger
   $app->addErrorMiddleware(
