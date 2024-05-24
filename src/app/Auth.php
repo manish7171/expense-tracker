@@ -6,18 +6,18 @@ namespace App;
 
 use App\Contracts\AuthInterface;
 use App\Entity\User;
-use Doctrine\ORM\EntityManager;
 use App\Contracts\UserInterface;
+use App\Contracts\UserProviderServiceInterface;
 
 class Auth implements AuthInterface
 {
   private ?UserInterface $user = null;
 
-  public function __construct(private readonly EntityManager $entityManager)
+  public function __construct(private readonly UserProviderServiceInterface $userProvider)
   {
   }
 
-  public function user(): UserInterface
+  public function user(): ?UserInterface
   {
     if ($this->user !== null) {
       return $this->user;
@@ -29,7 +29,7 @@ class Auth implements AuthInterface
       return null;
     }
 
-    $user = $this->entityManager->getRepository(User::class)->find($userId);
+    $user = $this->userProvider->getById($userId);
 
     if (!$user) {
       return null;
@@ -38,5 +38,35 @@ class Auth implements AuthInterface
     $this->user = $user;
 
     return $this->user;
+  }
+
+  public function attemptLogin(array $credentials): bool
+  {
+
+    $user = $this->userProvider->getByCredentials($credentials);
+
+    if (!$user || !$this->checkCredential($user, $credentials)) {
+      return false;
+    }
+
+    session_regenerate_id();
+
+    $_SESSION['user'] = $user->getId();
+
+    $this->user = $user;
+
+    return true;
+  }
+
+  public function checkCredential(UserInterface $user, array $credentials): bool
+  {
+    return password_verify($credentials['password'], $user->getPassword());
+  }
+
+  public function logout(): void
+  {
+    unset($_SESSION["user"]);
+
+    $this->user = null;
   }
 }
