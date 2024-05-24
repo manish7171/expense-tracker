@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Middleware;
 
-use App\Exceptions\SessionException;
-use App\Exceptions\ValidationException;
-use Psr\Http\Message\ResponseFactoryInterface;
+use App\Contracts\SessionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -14,27 +12,23 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class StartSessionMiddleware implements MiddlewareInterface
 {
-  public function __construct(private readonly ResponseFactoryInterface $responseFactory)
+  public function __construct(private readonly SessionInterface $session)
   {
   }
 
   public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
   {
-    if (session_status() === PHP_SESSION_ACTIVE) {
-      throw new SessionException("Session has already been started.");
-    }
-
-    if (headers_sent($filename, $line)) {
-      throw new SessionException("Headers already sent");
-    }
-
-    session_set_cookie_params(["secure" => true, "httponly" => true, "samesite" => "lax"]);
-
-    session_start();
+    $this->session->start();
 
     $response = $handler->handle($request);
 
-    session_write_close();
+    //TODO: check for XHR request
+    //
+    if ($request->getMethod() === 'GET') {
+      $this->session->put('previousUrl', (string)$request->getUri());
+    }
+
+    $this->session->save();
 
     return $response;
   }

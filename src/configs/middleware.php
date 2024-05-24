@@ -7,7 +7,6 @@ use Slim\App;
 use App\Config;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
-use App\Middleware\AuthenticateMiddleware;
 use App\Middleware\StartSessionMiddleware;
 use App\Middleware\ValidationErrorsMiddleware;
 use App\Middleware\ValidationExceptionMiddleware;
@@ -16,18 +15,17 @@ return function (App $app) {
   $container = $app->getContainer();
   $config    = $container->get(Config::class);
 
-  // Twig
-  $app->add(AuthenticateMiddleware::class);
   $app->add(TwigMiddleware::create($app, $container->get(Twig::class)));
   $app->add(ValidationExceptionMiddleware::class);
   $app->add(ValidationErrorsMiddleware::class);
   $app->add(OldFormDataMiddleware::class);
   $app->add(StartSessionMiddleware::class);
+  // Twig
 
   // Logger
-  //$app->addErrorMiddleware(
-  //  (bool) $config->get('display_error_details'),
-  //  (bool) $config->get('log_errors'),
-  //  (bool) $config->get('log_error_details')
-  //);
+  $app->addErrorMiddleware(
+    (bool) $config->get('display_error_details'),
+    (bool) $config->get('log_errors'),
+    (bool) $config->get('log_error_details')
+  );
 };
