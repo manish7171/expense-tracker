@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Contracts\AuthInterface;
+use App\DTO\RegisterUserData;
 use App\Entity\User;
 use App\Exceptions\ValidationException;
 use Doctrine\ORM\EntityManager;
@@ -52,16 +53,9 @@ class AuthController
       throw new ValidationException($v->errors());
     }
 
-    $user = new User();
+    $this->auth->register(new RegisterUserData($data['name'], $data['email'], $data['password']));
 
-    $user->setName($data['name']);
-    $user->setEmail($data['email']);
-    $user->setPassword(password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 12]));
-
-    $this->entityManager->persist($user);
-    $this->entityManager->flush();
-
-    return $response;
+    return $response->withHeader('Location', '/')->withStatus(302);
   }
 
   public function logIn(Request $request, Response $response): Response
