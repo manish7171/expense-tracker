@@ -39,7 +39,6 @@ class AuthController
   {
     $data = $this->requestValidatorFactory->make(RegisterUserRequestValidator::class)->validate($request->getParsedBody());
 
-
     $this->auth->register(new RegisterUserData($data['name'], $data['email'], $data['password']));
 
     return $response->withHeader('Location', '/')->withStatus(302);
