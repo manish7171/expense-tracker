@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Contracts;
+namespace App\RequestValidators;
 
+use App\Contracts\RequestValidatorFactoryInterface;
+use App\Contracts\RequestValidatorInterface;
 use Psr\Container\ContainerInterface;
 
 class RequestValidatorFactory implements RequestValidatorFactoryInterface
