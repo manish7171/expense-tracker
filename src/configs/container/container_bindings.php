@@ -67,7 +67,7 @@ return [
 
     $twig->addExtension(new IntlExtension());
     $twig->addExtension(new EntryFilesTwigExtension($container));
-    //$twig->addExtension(new AssetExtension($container->get('webpack_encore.packages')));
+    $twig->addExtension(new AssetExtension($container->get('webpack_encore.packages')));
     return $twig;
   },
   /**
