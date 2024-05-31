@@ -1,7 +1,4 @@
-import { Modal } from "bootstrap";
-
 window.addEventListener("DOMContentLoaded", function () {
-  $document.getElementById("editCategoryModal").modal();
   const editCategoryModal = new Modal(
     document.getElementById("editCategoryModal"),
   );
