@@ -24,6 +24,7 @@ return function (App $app) {
   $app->add(ValidationErrorsMiddleware::class);
   $app->add(OldFormDataMiddleware::class);
   $app->add(StartSessionMiddleware::class);
+  $app->addBodyParsingMiddleware();
   // Twig
 
   // Logger
