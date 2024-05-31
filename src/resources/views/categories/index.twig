@@ -8,6 +8,7 @@
 {% block title %}Categories{% endblock %}
 
 {% block content %}
+<script src="/build/ajax.js"></script>
 <script>
 window.addEventListener("DOMContentLoaded", function () {
     const editCategoryModal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
@@ -34,7 +35,8 @@ window.addEventListener("DOMContentLoaded", function () {
                 ...getCsrfFields()
               }),
             headers:{
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
               }
           })
         .then((response) => (response.text())).then((response) => console.log(response));

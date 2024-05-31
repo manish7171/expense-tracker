@@ -18,13 +18,9 @@ class CategoryService
   {
     $category = new Category();
 
-    $category->setName($name);
     $category->setUser($user);
 
-    $this->entityManager->persist($category);
-    $this->entityManager->flush();
-
-    return $category;
+    return $this->update(category: $category, name: $name);
   }
 
   public function getAll(): array
@@ -43,5 +39,16 @@ class CategoryService
   public function getById(int $id): ?Category
   {
     return $this->entityManager->find(Category::class, $id);
+  }
+
+  public function update(Category $category, string $name): Category
+  {
+
+    $category->setName($name);
+
+    $this->entityManager->persist($category);
+    $this->entityManager->flush();
+
+    return $category;
   }
 }
