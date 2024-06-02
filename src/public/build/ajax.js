@@ -86,5 +86,3 @@ function getCsrfFields() {
     [csrfValueKey]: csrfValue,
   };
 }
-
-export { ajax, get, post, del };
