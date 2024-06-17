@@ -8,14 +8,31 @@ use App\Contracts\AuthInterface;
 use App\Contracts\SessionInterface;
 use App\Contracts\UserInterface;
 use App\Contracts\UserProviderServiceInterface;
-use App\DTO\RegisterUserData;
+use App\DataObjects\RegisterUserData;
+use App\Enums\AuthAttemptStatus;
+use App\Mail\SignupEmail;
+use App\Mail\TwoFactorAuthEmail;
+use App\Services\UserLoginCodeService;
 
 class Auth implements AuthInterface
 {
   private ?UserInterface $user = null;
 
-  public function __construct(private readonly UserProviderServiceInterface $userProvider, private readonly SessionInterface $session)
+  public function __construct(
+    private readonly UserProviderServiceInterface $userProvider,
+    private readonly SessionInterface $session,
+    private readonly SignupEmail $signupEmail,
+    private readonly TwoFactorAuthEmail $twoFactorAuthEmail,
+    private readonly UserLoginCodeService $userLoginCodeService
+  ) {
+  }
+
+  public function test()
   {
+    $user = $this->userProvider->getById(1);
+    var_dump($user);
+    var_dump('testing');
+    die;
   }
 
   public function user(): ?UserInterface
@@ -41,49 +58,91 @@ class Auth implements AuthInterface
     return $this->user;
   }
 
-  public function attemptLogin(array $credentials): bool
+  public function attemptLogin(array $credentials): AuthAttemptStatus
   {
-
     $user = $this->userProvider->getByCredentials($credentials);
 
-    if (!$user || !$this->checkCredential($user, $credentials)) {
-      return false;
+    if (!$user || !$this->checkCredentials($user, $credentials)) {
+      return AuthAttemptStatus::FAILED;
     }
 
-    $this->login($user);
+    if ($user->hasTwoFactorAuthEnabled()) {
+      $this->startLoginWith2FA($user);
 
-    return true;
+      return AuthAttemptStatus::TWO_FACTOR_AUTH;
+    }
+
+    $this->logIn($user);
+
+    return AuthAttemptStatus::SUCCESS;
   }
 
-  public function checkCredential(UserInterface $user, array $credentials): bool
+  public function checkCredentials(UserInterface $user, array $credentials): bool
   {
     return password_verify($credentials['password'], $user->getPassword());
   }
 
-  public function logout(): void
+  public function logOut(): void
   {
-    $this->session->forget("user");
-
+    $this->session->forget('user');
     $this->session->regenerate();
 
     $this->user = null;
-  }
-
-  public function login(UserInterface $user): void
-  {
-    $this->session->regenerate();
-
-    $this->session->put("user", $user->getId());
-
-    $this->user = $user;
   }
 
   public function register(RegisterUserData $data): UserInterface
   {
     $user = $this->userProvider->createUser($data);
 
-    $this->login($user);
+    $this->logIn($user);
+
+    $this->signupEmail->send($user);
 
     return $user;
+  }
+
+  public function logIn(UserInterface $user): void
+  {
+    $this->session->regenerate();
+    $this->session->put('user', $user->getId());
+
+    $this->user = $user;
+  }
+
+  public function startLoginWith2FA(UserInterface $user): void
+  {
+    $this->session->regenerate();
+    $this->session->put('2fa', $user->getId());
+
+    $this->userLoginCodeService->deactivateAllActiveCodes($user);
+
+    $this->twoFactorAuthEmail->send($this->userLoginCodeService->generate($user));
+  }
+
+  public function attemptTwoFactorLogin(array $data): bool
+  {
+    $userId = $this->session->get('2fa');
+
+    if (!$userId) {
+      return false;
+    }
+
+    $user = $this->userProvider->getById($userId);
+
+    if (!$user || $user->getEmail() !== $data['email']) {
+      return false;
+    }
+
+    if (!$this->userLoginCodeService->verify($user, $data['code'])) {
+      return false;
+    }
+
+    $this->session->forget('2fa');
+
+    $this->logIn($user);
+
+    $this->userLoginCodeService->deactivateAllActiveCodes($user);
+
+    return true;
   }
 }

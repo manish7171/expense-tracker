@@ -5,3 +5,4 @@ docker/storage
 src/.phpunit.result.cache
 src/.phpunit.cache/
 src/storage/cache/
+src/public/build

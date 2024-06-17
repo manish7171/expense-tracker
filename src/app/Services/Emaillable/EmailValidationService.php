@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Emaillable;
 
 use App\Contracts\EmailValidationInterface;
-use App\DTO\EmailValidationResult;
+use App\DataObjects\EmailValidationResult;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\HandlerStack;

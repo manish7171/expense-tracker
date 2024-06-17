@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Contracts\OwnableInterface;
+use App\Contracts\UserInterface;
+use App\Entity\Traits\HasTimestamps;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Column;
@@ -12,17 +15,14 @@ use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\OneToMany;
-use Doctrine\ORM\Mapping\PrePersist;
-use Doctrine\ORM\Mapping\PreUpdate;
 use Doctrine\ORM\Mapping\Table;
-use Doctrine\Persistence\Event\LifecycleEventArgs;
-
-use App\Contracts\UserInterface;
 
 #[Entity, Table('users')]
 #[HasLifecycleCallbacks]
 class User implements UserInterface
 {
+  use HasTimestamps;
+
   #[Id, Column(options: ['unsigned' => true]), GeneratedValue]
   private int $id;
 
@@ -35,37 +35,28 @@ class User implements UserInterface
   #[Column]
   private string $password;
 
-  #[Column(name: 'created_at')]
-  private \DateTime $createdAt;
+  #[Column(name: 'two_factor', options: ['default' => false])]
+  private bool $twoFactor;
 
-  #[Column(name: 'updated_at')]
-  private \DateTime $updatedAt;
+  #[Column(name: 'verified_at', nullable: true)]
+  private ?\DateTime $verifiedAt;
 
-  #[OneToMany(mappedBy: 'users', targetEntity: Category::class)]
+  #[OneToMany(mappedBy: 'user', targetEntity: Category::class)]
   private Collection $categories;
 
-  #[OneToMany(mappedBy: 'users', targetEntity: Transaction::class)]
+  #[OneToMany(mappedBy: 'user', targetEntity: Transaction::class)]
   private Collection $transactions;
 
   public function __construct()
   {
     $this->categories   = new ArrayCollection();
     $this->transactions = new ArrayCollection();
+    $this->twoFactor    = false;
   }
 
   public function getId(): int
   {
     return $this->id;
-  }
-
-  #[PrePersist, PreUpdate]
-  public function updateTimestamps(LifecycleEventArgs $args): void
-  {
-    if (!isset($this->createdAt)) {
-      $this->createdAt = new \DateTime();
-    }
-
-    $this->updatedAt = new \DateTime();
   }
 
   public function getName(): string
@@ -104,30 +95,6 @@ class User implements UserInterface
     return $this;
   }
 
-  public function getCreatedAt(): \DateTime
-  {
-    return $this->createdAt;
-  }
-
-  public function setCreatedAt(\DateTime $createdAt): User
-  {
-    $this->createdAt = $createdAt;
-
-    return $this;
-  }
-
-  public function getUpdatedAt(): \DateTime
-  {
-    return $this->updatedAt;
-  }
-
-  public function setUpdatedAt(\DateTime $updatedAt): User
-  {
-    $this->updatedAt = $updatedAt;
-
-    return $this;
-  }
-
   public function getCategories(): ArrayCollection|Collection
   {
     return $this->categories;
@@ -151,4 +118,34 @@ class User implements UserInterface
 
     return $this;
   }
+
+  public function canManage(OwnableInterface $entity): bool
+  {
+    return $this->getId() === $entity->getUser()->getId();
+  }
+
+  public function getVerifiedAt(): ?\DateTime
+  {
+    return $this->verifiedAt;
+  }
+
+  public function setVerifiedAt(\DateTime $verifiedAt): static
+  {
+    $this->verifiedAt = $verifiedAt;
+
+    return $this;
+  }
+
+  public function hasTwoFactorAuthEnabled(): bool
+  {
+    return $this->twoFactor;
+  }
+
+  public function setTwoFactor(bool $twoFactor): User
+  {
+    $this->twoFactor = $twoFactor;
+
+    return $this;
+  }
 }
+

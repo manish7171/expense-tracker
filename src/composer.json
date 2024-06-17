@@ -16,7 +16,13 @@
     "symfony/console": "^7.0",
     "symfony/twig-bridge": "^7.0",
     "symfony/webpack-encore-bundle": "^2.1",
-    "slim/csrf": "^1.4"
+    "slim/csrf": "^1.4",
+    "itsgoingd/clockwork": "^5.2",
+    "league/flysystem": "^3.28",
+    "league/mime-type-detection": "^1.15",
+    "psr/simple-cache": "^3.0",
+    "symfony/mailer": "^7.1",
+    "symfony/rate-limiter": "^7.1"
   },
   "autoload": {
     "psr-4": {

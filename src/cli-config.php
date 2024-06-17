@@ -20,11 +20,11 @@ $params = [
   'host'     => $_ENV['DB_HOST'],
   'user'     => $_ENV['DB_USER'],
   'password' => $_ENV['DB_PASS'],
-  'dbname'   => $_ENV['DB_DATABASE'],
+  'dbname'   => $_ENV['DB_NAME'],
   'driver'   => $_ENV['DB_DRIVER'] ?? 'pdo_mysql',
 ];
 
-$config = new PhpFile('migrations.php'); // Or use one of the Doctrine\Migrations\Configuration\Configuration\* loaders
+$config = new PhpFile('./configs/migrations.php'); // Or use one of the Doctrine\Migrations\Configuration\Configuration\* loaders
 
 $paths = [__DIR__ . '/app/Entity'];
 $isDevMode = true;

@@ -17,27 +17,34 @@ class Receipt
   #[Id, Column(options: ['unsigned' => true]), GeneratedValue]
   private int $id;
 
-  #[Column(name: 'file_name')]
-  private string $fileName;
+  #[Column]
+  private string $filename;
+
+  #[Column(name: 'storage_filename')]
+  private string $storageFilename;
+
+  #[Column(name: 'media_type')]
+  private string $mediaType;
 
   #[Column(name: 'created_at')]
   private \DateTime $createdAt;
 
   #[ManyToOne(inversedBy: 'receipts')]
   private Transaction $transaction;
+
   public function getId(): int
   {
     return $this->id;
   }
 
-  public function getFileName(): string
+  public function getFilename(): string
   {
-    return $this->fileName;
+    return $this->filename;
   }
 
-  public function setFileName(string $fileName): Receipt
+  public function setFilename(string $filename): Receipt
   {
-    $this->fileName = $fileName;
+    $this->filename = $filename;
 
     return $this;
   }
@@ -67,4 +74,29 @@ class Receipt
 
     return $this;
   }
+
+  public function getStorageFilename(): string
+  {
+    return $this->storageFilename;
+  }
+
+  public function setStorageFilename(string $storageFilename): Receipt
+  {
+    $this->storageFilename = $storageFilename;
+
+    return $this;
+  }
+
+  public function getMediaType(): string
+  {
+    return $this->mediaType;
+  }
+
+  public function setMediaType(string $mediaType): Receipt
+  {
+    $this->mediaType = $mediaType;
+
+    return $this;
+  }
 }
+

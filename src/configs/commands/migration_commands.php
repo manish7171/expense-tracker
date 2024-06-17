@@ -32,3 +32,4 @@ return fn (DependencyFactory $dependencyFactory) => [
   new ListCommand($dependencyFactory),
   new DiffCommand($dependencyFactory),
 ];
+

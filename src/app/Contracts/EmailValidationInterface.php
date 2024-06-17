@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Contracts;
 
-use App\DTO\EmailValidationResult;
+use App\DataObjects\EmailValidationResult;
 
 interface EmailValidationInterface
 {

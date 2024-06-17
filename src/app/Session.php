@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App;
 
 use App\Contracts\SessionInterface;
-use App\DTO\SessionConfig;
+//use App\DataObjects\SessionConfig;
+use App\SessionConfig;
 use App\Exceptions\SessionException;
 
 class Session implements SessionInterface

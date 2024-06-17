@@ -8,6 +8,7 @@ services:
         GROUP_ID: "${WWWGROUP:-1000}"
         USER: "${USER:-whoami}"
     container_name: php_app
+    image: expense:latest
     restart: always
     working_dir: /var/www/
     extra_hosts:
@@ -17,6 +18,8 @@ services:
     volumes:
       - ../src:/var/www
       - ./local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - expense-network
 
   nginx:
     image: nginx:alpine
@@ -27,6 +30,8 @@ services:
     volumes:
       - ../src:/var/www
       - ./nginx:/etc/nginx/conf.d/
+    networks:
+      - expense-network
 
   db:
     image: mysql:8.0
@@ -38,6 +43,8 @@ services:
       MYSQL_ROOT_PASSWORD: root
     ports:
       - 3306:3306
+    networks:
+      - expense-network
 
   pma:
     container_name: php_pma
@@ -52,6 +59,9 @@ services:
         #- hotel.db
     ports:
       - 8888:80
+    networks:
+      - expense-network
+
   mailhog:
     container_name: php_mailhog
     image: mailhog/mailhog
@@ -61,3 +71,19 @@ services:
     ports:
       - 8025:8025
       - 1025:1025
+    networks:
+      - expense-network
+
+  redis:
+    image: redis:latest
+    container_name: expennies-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass mypassword
+    networks:
+      - expense-network
+
+networks:
+  expense-network:
+    driver: bridge
