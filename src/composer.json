@@ -1,28 +1,29 @@
 {
   "require": {
     "ext-pdo": "*",
-    "vlucas/phpdotenv": "^5.6",
-    "doctrine/dbal": "^4.0",
-    "doctrine/orm": "^3.1",
-    "symfony/cache": "^7.0",
-    "doctrine/migrations": "^3.7",
-    "twig/twig": "^3.9",
-    "vlucas/valitron": "^1.4",
-    "slim/slim": "4.*",
-    "slim/psr7": "^1.6",
-    "slim/twig-view": "^3.4",
-    "twig/intl-extra": "^3.9",
-    "php-di/php-di": "^7.0",
-    "symfony/console": "^7.0",
-    "symfony/twig-bridge": "^7.0",
-    "symfony/webpack-encore-bundle": "^2.1",
-    "slim/csrf": "^1.4",
+    "ext-redis": "*",
+    "beberlei/doctrineextensions": "^1.5",
+    "doctrine/dbal": "^3.4",
+    "doctrine/migrations": "^3.5",
+    "doctrine/orm": "^2.13",
     "itsgoingd/clockwork": "^5.2",
     "league/flysystem": "^3.28",
     "league/mime-type-detection": "^1.15",
-    "psr/simple-cache": "^3.0",
+    "php-di/php-di": "^7.0",
+    "slim/csrf": "^1.5",
+    "slim/psr7": "^1.7",
+    "slim/slim": "^4.14",
+    "slim/twig-view": "^3.4",
+    "symfony/cache": "^7.1",
+    "symfony/console": "^7.1",
     "symfony/mailer": "^7.1",
-    "symfony/rate-limiter": "^7.1"
+    "symfony/rate-limiter": "^7.1",
+    "symfony/twig-bridge": "^7.1",
+    "symfony/webpack-encore-bundle": "^2.1",
+    "twig/intl-extra": "^3.10",
+    "twig/twig": "^3.10",
+    "vlucas/phpdotenv": "^5.6",
+    "vlucas/valitron": "^1.4"
   },
   "autoload": {
     "psr-4": {
@@ -33,6 +34,10 @@
     "psr-4": {
       "Tests\\": "tests/"
     }
+  },
+  "config": {
+    "sort-packages": true,
+    "optimize-autoloader": true
   },
   "require-dev": {
     "phpunit/phpunit": "^10.0"

@@ -12,9 +12,6 @@ use Valitron\Validator;
 
 class UserLoginRequestValidator implements RequestValidatorInterface
 {
-  public function __construct(private readonly EntityManager $entityManager)
-  {
-  }
 
   public function validate(array $data): array
   {

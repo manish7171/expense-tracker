@@ -7,8 +7,8 @@ namespace App\Controllers;
 use App\Contracts\AuthInterface;
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\DataObjects\RegisterUserData;
-use App\Enum\AuthAttemptStatus;
-use App\Exception\ValidationException;
+use App\Enums\AuthAttemptStatus;
+use App\Exceptions\ValidationException;
 use App\RequestValidators\RegisterUserRequestValidator;
 use App\RequestValidators\TwoFactorLoginRequestValidator;
 use App\RequestValidators\UserLoginRequestValidator;
@@ -29,7 +29,6 @@ class AuthController
 
   public function loginView(Response $response): Response
   {
-    $this->auth->test();
     return $this->twig->render($response, 'auth/login.twig');
   }
 

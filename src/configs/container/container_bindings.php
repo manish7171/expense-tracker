@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Auth;
 use App\Config;
+use App\BuildEntryPoints;
 use App\Contracts\AuthInterface;
 use App\Contracts\EntityManagerServiceInterface;
 use App\Contracts\RequestValidatorFactoryInterface;
@@ -51,11 +52,11 @@ use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mime\BodyRendererInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\CacheStorage;
-use Symfony\WebpackEncoreBundle\Asset\EntrypointLookup;
 use Symfony\WebpackEncoreBundle\Asset\TagRenderer;
 use Symfony\WebpackEncoreBundle\Twig\EntryFilesTwigExtension;
 use Twig\Extra\Intl\IntlExtension;
 use Clockwork\Clockwork;
+use Symfony\WebpackEncoreBundle\Asset\EntrypointLookupCollection;
 
 use function DI\create;
 
@@ -127,8 +128,10 @@ return [
   'webpack_encore.packages'               => fn () => new Packages(
     new Package(new JsonManifestVersionStrategy(BUILD_PATH . '/manifest.json'))
   ),
+  'buildEntryPoints' => fn () => new BuildEntryPoints(),
   'webpack_encore.tag_renderer'           => fn (ContainerInterface $container) => new TagRenderer(
-    new EntrypointLookup(BUILD_PATH . '/entrypoints.json'),
+    // new EntrypointLookup(BUILD_PATH . '/entrypoints.json'),
+    new EntrypointLookupCollection($container->get('buildEntryPoints')),
     $container->get('webpack_encore.packages')
   ),
   ResponseFactoryInterface::class         => fn (App $app) => $app->getResponseFactory(),
@@ -222,4 +225,3 @@ return [
     new CacheStorage($redisAdapter)
   ),
 ];
-

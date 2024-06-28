@@ -27,14 +27,6 @@ class Auth implements AuthInterface
   ) {
   }
 
-  public function test()
-  {
-    $user = $this->userProvider->getById(1);
-    var_dump($user);
-    var_dump('testing');
-    die;
-  }
-
   public function user(): ?UserInterface
   {
     if ($this->user !== null) {
