@@ -22,7 +22,6 @@ class TransactionImportService
   {
     $resource   = fopen($file, 'r');
     $categories = $this->categoryService->getAllKeyedByName();
-
     fgetcsv($resource);
 
     $count     = 1;
