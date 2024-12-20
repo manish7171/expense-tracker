@@ -30,6 +30,7 @@ window.addEventListener("DOMContentLoaded", function () {
             "Aug",
             "Sep",
             "Oct",
+            "Nov",
             "Dec",
           ],
           datasets: [
