@@ -79,20 +79,15 @@ class TransactionService
   public function getTotals(\DateTime $startDate, \DateTime $endDate): array
   {
     $query = $this->entityManager->createQuery(
-      'SELECT SUM(t.amount) AS net, 
-                    SUM(CASE WHEN t.amount > 0 THEN t.amount ELSE 0 END) AS income,
-                    SUM(CASE WHEN t.amount < 0 THEN ABS(t.amount) ELSE 0 END) as expense
+      'SELECT COALESCE(SUM(t.amount), 0) AS net, 
+                    COALESCE(SUM(CASE WHEN t.amount > 0 THEN t.amount ELSE 0 END), 0) AS income,
+                    COALESCE(SUM(CASE WHEN t.amount < 0 THEN ABS(t.amount) ELSE 0 END), 0) as expense
              FROM App\Entity\Transaction t
              WHERE t.date BETWEEN :start AND :end'
     );
     $query->setParameter('start', $startDate->format('Y-m-d 00:00:00'));
     $query->setParameter('end', $endDate->format('Y-m-d 23:59:59'));
-
-    return array_map(function ($row) {
-      if (empty($row)) {
-        return 0;
-      }
-    }, $query->getSingleResult());
+    return ($query->getSingleResult());
   }
 
   public function getRecentTransactions(int $limit): array
