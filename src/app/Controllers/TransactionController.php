@@ -9,6 +9,7 @@ use App\Contracts\RequestValidatorFactoryInterface;
 use App\DataObjects\TransactionData;
 use App\Entity\Receipt;
 use App\Entity\Transaction;
+use App\Enums\TransactionType;
 use App\RequestValidators\TransactionRequestValidator;
 use App\ResponseFormatter;
 use App\Services\CategoryService;
@@ -46,11 +47,11 @@ class TransactionController
     $data = $this->requestValidatorFactory->make(TransactionRequestValidator::class)->validate(
       $request->getParsedBody()
     );
-
+    $amount = $data['transaction-type'] === TransactionType::EXPENSE ? (float) (-1 * abs((float)$data['amount'])) : (float) $data['amount'];
     $transaction = $this->transactionService->create(
       new TransactionData(
         $data['description'],
-        (float) $data['amount'],
+        $amount,
         new DateTime($data['date']),
         $data['category']
       ),
@@ -88,12 +89,13 @@ class TransactionController
       $request->getParsedBody()
     );
 
+    $amount = $data['transaction-type'] === TransactionType::EXPENSE ? (float) (-1 * abs($data['amount'])) : (float) $data['amount'];
     $this->entityManagerService->sync(
       $this->transactionService->update(
         $transaction,
         new TransactionData(
           $data['description'],
-          (float) $data['amount'],
+          $amount,
           new DateTime($data['date']),
           $data['category']
         )

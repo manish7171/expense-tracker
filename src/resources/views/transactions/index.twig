@@ -19,12 +19,18 @@
                 <i class="bi bi-plus-circle me-1"></i>
                 Import Transactions
             </button>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newTransactionModal">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newExpenseModal">
                 <i class="bi bi-plus-circle me-1"></i>
-                New Transaction
+                New Expense
+            </button>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newIncomeModal">
+                <i class="bi bi-plus-circle me-1"></i>
+                New Income
             </button>
         </div>
-        {% include 'transactions/transaction_modal.twig' with {modal: {title: 'Create Transaction', id: 'newTransactionModal', isEdit: false}} %}
+        {% include 'transactions/expense_modal.twig' with {modal: {title: 'Add Expense', id: 'newExpenseModal', isEdit: false}} %}
+        {% include 'transactions/income_modal.twig' with {modal: {title: 'Add Income', id: 'newIncomeModal', isEdit: false}} %}
+        {% include 'transactions/transaction_modal.twig' with {modal: {title: 'Add Income', id: 'newIncomeModal', isEdit: false}} %}
         {% include 'transactions/transaction_modal.twig' with {modal: {title: 'Edit Transaction', id: 'editTransactionModal', isEdit: true}} %}
         {% include 'transactions/upload_receipt_modal.twig' %}
         {% include 'transactions/import_transactions_modal.twig' %}

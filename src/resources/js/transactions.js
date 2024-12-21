@@ -5,9 +5,11 @@ import DataTable from "datatables.net";
 import "../css/transactions.scss";
 
 window.addEventListener("DOMContentLoaded", function () {
-  const newTransactionModal = new Modal(
+  /*const newTransactionModal = new Modal(
     document.getElementById("newTransactionModal"),
-  );
+  );*/
+  const newExpenseModal = new Modal(document.getElementById("newExpenseModal"));
+  const newIncomeModal = new Modal(document.getElementById("newIncomeModal"));
   const editTransactionModal = new Modal(
     document.getElementById("editTransactionModal"),
   );
@@ -192,13 +194,13 @@ window.addEventListener("DOMContentLoaded", function () {
     .addEventListener("click", function (event) {
       post(
         `/transactions`,
-        getTransactionFormData(newTransactionModal),
-        newTransactionModal._element,
+        getTransactionFormData(newExpenseModal),
+        newExpenseModal._element,
       ).then((response) => {
         if (response.ok) {
           table.draw();
 
-          newTransactionModal.hide();
+          newExpenseModal.hide();
         }
       });
     });
@@ -301,7 +303,7 @@ function getTransactionFormData(modal) {
   fields.forEach((select) => {
     data[select.name] = select.value;
   });
-
+  console.log(data);
   return data;
 }
 
