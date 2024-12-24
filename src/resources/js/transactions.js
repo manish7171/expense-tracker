@@ -5,9 +5,6 @@ import DataTable from "datatables.net";
 import "../css/transactions.scss";
 
 window.addEventListener("DOMContentLoaded", function () {
-  /*const newTransactionModal = new Modal(
-    document.getElementById("newTransactionModal"),
-  );*/
   const newExpenseModal = new Modal(document.getElementById("newExpenseModal"));
   const newIncomeModal = new Modal(document.getElementById("newIncomeModal"));
   const editTransactionModal = new Modal(
