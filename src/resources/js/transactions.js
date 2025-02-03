@@ -185,6 +185,21 @@ window.addEventListener("DOMContentLoaded", function () {
         });
       }
     });
+  document
+    .getElementById("save-income-transaction")
+    .addEventListener("click", function () {
+      post(
+        `/transactions`,
+        getTransactionFormData(newIncomeModal),
+        newIncomeModal._element,
+      ).then((response) => {
+        if (response.ok) {
+          table.draw();
+
+          newIncomeModal.hide();
+        }
+      });
+    });
 
   document
     .querySelector(".create-transaction-btn")
@@ -300,7 +315,6 @@ function getTransactionFormData(modal) {
   fields.forEach((select) => {
     data[select.name] = select.value;
   });
-  console.log(data);
   return data;
 }
 

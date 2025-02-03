@@ -30,7 +30,6 @@
         </div>
         {% include 'transactions/expense_modal.twig' with {modal: {title: 'Add Expense', id: 'newExpenseModal', isEdit: false}} %}
         {% include 'transactions/income_modal.twig' with {modal: {title: 'Add Income', id: 'newIncomeModal', isEdit: false}} %}
-        {% include 'transactions/transaction_modal.twig' with {modal: {title: 'Add Income', id: 'newIncomeModal', isEdit: false}} %}
         {% include 'transactions/transaction_modal.twig' with {modal: {title: 'Edit Transaction', id: 'editTransactionModal', isEdit: true}} %}
         {% include 'transactions/upload_receipt_modal.twig' %}
         {% include 'transactions/import_transactions_modal.twig' %}
