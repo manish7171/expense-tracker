@@ -13,9 +13,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class TransactionService
 {
-  public function __construct(private readonly EntityManagerServiceInterface $entityManager)
-  {
-  }
+  public function __construct(private readonly EntityManagerServiceInterface $entityManager) {}
 
   public function create(TransactionData $transactionData, User $user): Transaction
   {
@@ -67,6 +65,7 @@ class TransactionService
     $transaction->setAmount($transactionData->amount);
     $transaction->setDate($transactionData->date);
     $transaction->setCategory($transactionData->category);
+    $transaction->setTransactionType($transactionData->type);
 
     return $transaction;
   }

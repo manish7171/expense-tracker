@@ -16,6 +16,7 @@ use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\Table;
+use App\Enums\TransactionType;
 
 #[Entity, Table('categories')]
 #[HasLifecycleCallbacks]
@@ -28,6 +29,9 @@ class Category implements OwnableInterface
 
   #[Column]
   private string $name;
+
+  #[Column(name: 'type', type: 'string', options: ['default' => TransactionType::EXPENSE])]
+  private string $type;
 
   #[ManyToOne(inversedBy: 'categories')]
   private User $user;
@@ -82,5 +86,16 @@ class Category implements OwnableInterface
 
     return $this;
   }
-}
 
+  public function getType(): string
+  {
+    return $this->type;
+  }
+
+  public function setType(string $transactionType): Category
+  {
+    $this->type = $transactionType;
+
+    return $this;
+  }
+}

@@ -25,8 +25,7 @@ class CategoryController
     private readonly ResponseFormatter $responseFormatter,
     private readonly RequestService $requestService,
     private readonly EntityManagerServiceInterface $entityManagerService
-  ) {
-  }
+  ) {}
 
   public function index(Response $response): Response
   {
@@ -39,7 +38,7 @@ class CategoryController
       $request->getParsedBody()
     );
 
-    $category = $this->categoryService->create($data['name'], $request->getAttribute('user'));
+    $category = $this->categoryService->create($data['name'], $data['category-type'], $request->getAttribute('user'));
 
     $this->entityManagerService->sync($category);
 
@@ -55,7 +54,7 @@ class CategoryController
 
   public function get(Response $response, Category $category): Response
   {
-    $data = ['id' => $category->getId(), 'name' => $category->getName()];
+    $data = ['id' => $category->getId(), 'name' => $category->getName(), 'category' => $category->getType()];
 
     return $this->responseFormatter->asJson($response, $data);
   }
@@ -66,7 +65,7 @@ class CategoryController
       $request->getParsedBody()
     );
 
-    $this->entityManagerService->sync($this->categoryService->update($category, $data['name']));
+    $this->entityManagerService->sync($this->categoryService->update($category, $data['name'], $data['category-type']));
 
     return $response;
   }
@@ -79,6 +78,7 @@ class CategoryController
       return [
         'id'        => $category->getId(),
         'name'      => $category->getName(),
+        'type'      => $category->getType(),
         'createdAt' => $category->getCreatedAt()->format('m/d/Y g:i A'),
         'updatedAt' => $category->getUpdatedAt()->format('m/d/Y g:i A'),
       ];
@@ -94,4 +94,3 @@ class CategoryController
     );
   }
 }
-

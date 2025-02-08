@@ -30,8 +30,7 @@ class TransactionController
     private readonly RequestService $requestService,
     private readonly CategoryService $categoryService,
     private readonly EntityManagerServiceInterface $entityManagerService
-  ) {
-  }
+  ) {}
 
   public function index(Response $response): Response
   {
@@ -78,6 +77,7 @@ class TransactionController
       'amount'      => $transaction->getAmount(),
       'date'        => $transaction->getDate()->format('Y-m-d\TH:i'),
       'category'    => $transaction->getCategory()?->getId(),
+      'type'        => $transaction->getTransactionType()
     ];
 
     return $this->responseFormatter->asJson($response, $data);
@@ -89,13 +89,14 @@ class TransactionController
       $request->getParsedBody()
     );
 
-    $amount = $data['transaction-type'] === TransactionType::EXPENSE ? (float) (-1 * abs($data['amount'])) : (float) $data['amount'];
+    $amount = $data['type'] === TransactionType::EXPENSE ? (float) (-1 * abs((float)$data['amount'])) : (float) $data['amount'];
     $this->entityManagerService->sync(
       $this->transactionService->update(
         $transaction,
         new TransactionData(
           $data['description'],
           $amount,
+          $data['type'],
           new DateTime($data['date']),
           $data['category']
         )
@@ -116,8 +117,9 @@ class TransactionController
         'amount'      => $transaction->getAmount(),
         'date'        => $transaction->getDate()->format('m/d/Y g:i A'),
         'category'    => $transaction->getCategory()?->getName(),
+        'type'        => $transaction->getTransactionType() ?? '',
         'wasReviewed' => $transaction->wasReviewed(),
-        'receipts'    => $transaction->getReceipts()->map(fn (Receipt $receipt) => [
+        'receipts'    => $transaction->getReceipts()->map(fn(Receipt $receipt) => [
           'name' => $receipt->getFilename(),
           'id'   => $receipt->getId(),
         ])->toArray(),

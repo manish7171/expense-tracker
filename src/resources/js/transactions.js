@@ -321,7 +321,6 @@ function getTransactionFormData(modal) {
 function openEditTransactionModal(modal, { id, ...data }) {
   for (let name in data) {
     const nameInput = modal._element.querySelector(`[name="${name}"]`);
-
     nameInput.value = data[name];
   }
 

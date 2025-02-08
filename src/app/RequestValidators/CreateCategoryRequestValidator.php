@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\RequestValidators;
 
 use App\Contracts\RequestValidatorInterface;
+use App\Enums\TransactionType;
 use App\Exceptions\ValidationException;
 use Valitron\Validator;
 
@@ -16,6 +17,8 @@ class CreateCategoryRequestValidator implements RequestValidatorInterface
 
     $v->rule('required', 'name');
     $v->rule('lengthMax', 'name', 50);
+    $v->rule('required', 'category-type');
+    $v->rule('in', 'category-type', [TransactionType::EXPENSE, TransactionType::INCOME]);
 
     if (!$v->validate()) {
       throw new ValidationException($v->errors());

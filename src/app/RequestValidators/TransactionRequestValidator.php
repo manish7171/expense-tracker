@@ -12,17 +12,15 @@ use Valitron\Validator;
 
 class TransactionRequestValidator implements RequestValidatorInterface
 {
-  public function __construct(protected readonly CategoryService $categoryService)
-  {
-  }
+  public function __construct(protected readonly CategoryService $categoryService) {}
 
   public function validate(array $data): array
   {
     $v = new Validator($data);
 
-    $v->rule('required', ['description', 'amount', 'date', 'category', 'transaction-type'])->message('Required field');
+    $v->rule('required', ['description', 'amount', 'date', 'category', 'type'])->message('Required field');
     $v->rule('lengthMax', 'description', 255);
-    $v->rule('in', 'transaction-type', [TransactionType::EXPENSE, TransactionType::INCOME]);
+    $v->rule('in', 'type', [TransactionType::EXPENSE, TransactionType::INCOME]);
     $v->rule('dateFormat', 'dateFormat', 'm/d/Y g:i A');
     $v->rule('numeric', 'amount');
     $v->rule('integer', 'category');

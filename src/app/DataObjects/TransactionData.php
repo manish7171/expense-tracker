@@ -12,8 +12,8 @@ class TransactionData
   public function __construct(
     public readonly string $description,
     public readonly float $amount,
+    public readonly String $type,
     public readonly DateTime $date,
     public readonly ?Category $category
-  ) {
-  }
+  ) {}
 }

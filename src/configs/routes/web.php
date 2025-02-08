@@ -95,4 +95,3 @@ return function (App $app) {
       ->add(RateLimitMiddleware::class);
   })->add(GuestMiddleware::class);
 };
-

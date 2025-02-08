@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use App\Contracts\OwnableInterface;
 use App\Entity\Traits\HasTimestamps;
+use App\Enums\TransactionType;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -35,6 +36,9 @@ class Transaction implements OwnableInterface
 
   #[Column]
   private \DateTime $date;
+
+  #[Column(name: 'type', type: 'string', options: ['default' => TransactionType::EXPENSE])]
+  private string $type;
 
   #[Column(type: Types::DECIMAL, precision: 13, scale: 3)]
   private float $amount;
@@ -142,5 +146,16 @@ class Transaction implements OwnableInterface
 
     return $this;
   }
-}
 
+  public function getTransactionType(): string
+  {
+    return $this->type;
+  }
+
+  public function setTransactionType(string $transactionType): Transaction
+  {
+    $this->type = $transactionType;
+
+    return $this;
+  }
+}

@@ -13,6 +13,7 @@ window.addEventListener("DOMContentLoaded", function () {
     orderMulti: false,
     columns: [
       { data: "name" },
+      { data: "type" },
       { data: "createdAt" },
       { data: "updatedAt" },
       {
@@ -68,6 +69,9 @@ window.addEventListener("DOMContentLoaded", function () {
         {
           name: editCategoryModal._element.querySelector('input[name="name"]')
             .value,
+          "category-type": editCategoryModal._element.querySelector(
+            'input[name="category-type"][type="radio"]:checked',
+          ).value,
         },
         editCategoryModal._element,
       ).then((response) => {
@@ -79,10 +83,13 @@ window.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-function openEditCategoryModal(modal, { id, name }) {
+function openEditCategoryModal(modal, { id, name, category }) {
   const nameInput = modal._element.querySelector('input[name="name"]');
-
+  const categoryInput = modal._element.querySelector(
+    'input[name="category-type"][value="' + category + '"]',
+  );
   nameInput.value = name;
+  categoryInput.checked = true;
 
   modal._element
     .querySelector(".save-category-btn")

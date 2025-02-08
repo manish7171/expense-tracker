@@ -10,9 +10,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class RequestService
 {
-  public function __construct(private readonly SessionInterface $session)
-  {
-  }
+  public function __construct(private readonly SessionInterface $session) {}
 
   public function getReferer(ServerRequestInterface $request): string
   {
@@ -69,4 +67,3 @@ class RequestService
     return $serverParams['REMOTE_ADDR'] ?? null;
   }
 }
-
