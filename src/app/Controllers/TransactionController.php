@@ -51,6 +51,7 @@ class TransactionController
       new TransactionData(
         $data['description'],
         $amount,
+        $data['transaction-type'],
         new DateTime($data['date']),
         $data['category']
       ),
@@ -77,7 +78,7 @@ class TransactionController
       'amount'      => $transaction->getAmount(),
       'date'        => $transaction->getDate()->format('Y-m-d\TH:i'),
       'category'    => $transaction->getCategory()?->getId(),
-      'type'        => $transaction->getTransactionType()
+      'transaction-type'        => $transaction->getTransactionType()
     ];
 
     return $this->responseFormatter->asJson($response, $data);
@@ -88,15 +89,14 @@ class TransactionController
     $data = $this->requestValidatorFactory->make(TransactionRequestValidator::class)->validate(
       $request->getParsedBody()
     );
-
-    $amount = $data['type'] === TransactionType::EXPENSE ? (float) (-1 * abs((float)$data['amount'])) : (float) $data['amount'];
+    $amount = $data['transaction-type'] === TransactionType::EXPENSE ? (float) (-1 * abs((float)$data['amount'])) : (float) $data['amount'];
     $this->entityManagerService->sync(
       $this->transactionService->update(
         $transaction,
         new TransactionData(
           $data['description'],
           $amount,
-          $data['type'],
+          $data['transaction-type'],
           new DateTime($data['date']),
           $data['category']
         )

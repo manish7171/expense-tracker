@@ -18,9 +18,9 @@ class TransactionRequestValidator implements RequestValidatorInterface
   {
     $v = new Validator($data);
 
-    $v->rule('required', ['description', 'amount', 'date', 'category', 'type'])->message('Required field');
+    $v->rule('required', ['description', 'amount', 'date', 'category', 'transaction-type'])->message('Required field');
     $v->rule('lengthMax', 'description', 255);
-    $v->rule('in', 'type', [TransactionType::EXPENSE, TransactionType::INCOME]);
+    $v->rule('in', 'transaction-type', [TransactionType::EXPENSE, TransactionType::INCOME]);
     $v->rule('dateFormat', 'dateFormat', 'm/d/Y g:i A');
     $v->rule('numeric', 'amount');
     $v->rule('integer', 'category');
@@ -48,7 +48,6 @@ class TransactionRequestValidator implements RequestValidatorInterface
     if (!$v->validate()) {
       throw new ValidationException($v->errors());
     }
-
     return $data;
   }
 }
