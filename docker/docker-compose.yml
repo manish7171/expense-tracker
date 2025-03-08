@@ -26,14 +26,10 @@ services:
     container_name: php_nginx
     restart: always
     ports:
-      - "80:80"
-      - "443:443"
+      - "8000:80"
     volumes:
       - ../src:/var/www
       - ./nginx:/etc/nginx/conf.d/
-      - ./nginx/certs:/etc/nginx/certs
-      #- ./certbot/conf:/etc/letsencrypt
-      #- ./certbot/www:/var/www/certbot
     networks:
       - expense-network
 
@@ -88,14 +84,6 @@ services:
     command: redis-server --requirepass mypassword
     networks:
       - expense-network
-
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    command: certonly --webroot -w /var/www/certbot --force-renewal --email manish7171@gmail.com -d myserver.home --agree-tos
 
 networks:
   expense-network:
