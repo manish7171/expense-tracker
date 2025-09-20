@@ -109,7 +109,12 @@ class TransactionController
   public function load(Request $request, Response $response): Response
   {
     $params       = $this->requestService->getDataTableQueryParameters($request);
+    //var_dump($params);
+    //die;
     $transactions = $this->transactionService->getPaginatedTransactions($params);
+    $totalExpense = $this->transactionService->getTotalExpense($params);
+    $totalIncome = $this->transactionService->getTotalIncome($params);
+
     $transformer  = function (Transaction $transaction) {
       return [
         'id'          => $transaction->getId(),
@@ -132,7 +137,9 @@ class TransactionController
       $response,
       array_map($transformer, (array) $transactions->getIterator()),
       $params->draw,
-      $totalTransactions
+      $totalTransactions,
+      $totalExpense,
+      $totalIncome
     );
   }
 

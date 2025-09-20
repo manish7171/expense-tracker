@@ -20,8 +20,14 @@ class ResponseFormatter
     return $response;
   }
 
-  public function asDataTable(ResponseInterface $response, array $data, int $draw, int $total): ResponseInterface
-  {
+  public function asDataTable(
+    ResponseInterface $response,
+    array $data,
+    int $draw,
+    int $total,
+    int $totalExpense = 0,
+    int $totalIncome = 0,
+  ): ResponseInterface {
     return $this->asJson(
       $response,
       [
@@ -29,8 +35,9 @@ class ResponseFormatter
         'draw'            => $draw,
         'recordsTotal'    => $total,
         'recordsFiltered' => $total,
+        'totalExpense'    => $totalExpense,
+        'totalIncome'    => $totalIncome,
       ]
     );
   }
 }
-

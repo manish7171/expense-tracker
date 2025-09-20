@@ -4,7 +4,7 @@ import DataTable from "datatables.net";
 
 import "../css/transactions.scss";
 
-window.addEventListener("DOMContentLoaded", function () {
+window.addEventListener("DOMContentLoaded", function() {
   const newExpenseModal = new Modal(document.getElementById("newExpenseModal"));
   const newIncomeModal = new Modal(document.getElementById("newIncomeModal"));
   const editTransactionModal = new Modal(
@@ -16,10 +16,26 @@ window.addEventListener("DOMContentLoaded", function () {
   const importTransactionsModal = new Modal(
     document.getElementById("importTransactionsModal"),
   );
-
   const table = new DataTable("#transactionsTable", {
     serverSide: true,
-    ajax: "/transactions/load",
+    ajax: {
+      url: "/transactions/load",
+      data: function(d) {
+        d.transaction_month = document.getElementById('monthFilter').value;
+        d.transaction_year = document.getElementById('yearFilter').value;
+        d.transaction_category = document.getElementById('categoryFilter').value;
+      },
+      "dataSrc": function(json) {
+        const currency = new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'EUR',
+          minimumFractionDigits: 2
+        });
+        document.getElementById('total-expense').innerText = currency.format(Math.abs(json.totalExpense));
+        document.getElementById('total-income').innerText = currency.format(Math.abs(json.totalIncome));
+        return json.data;
+      }
+    },
     orderMulti: false,
     rowCallback: (row, data) => {
       if (!data.wasReviewed) {
@@ -128,7 +144,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
   document
     .querySelector("#transactionsTable")
-    .addEventListener("click", function (event) {
+    .addEventListener("click", function(event) {
       const editBtn = event.target.closest(".edit-transaction-btn");
       const deleteBtn = event.target.closest(".delete-transaction-btn");
       const uploadReceiptBtn = event.target.closest(".open-receipt-upload-btn");
@@ -187,7 +203,7 @@ window.addEventListener("DOMContentLoaded", function () {
     });
   document
     .getElementById("save-income-transaction")
-    .addEventListener("click", function () {
+    .addEventListener("click", function() {
       post(
         `/transactions`,
         getTransactionFormData(newIncomeModal),
@@ -203,7 +219,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
   document
     .querySelector(".create-transaction-btn")
-    .addEventListener("click", function (event) {
+    .addEventListener("click", function(event) {
       post(
         `/transactions`,
         getTransactionFormData(newExpenseModal),
@@ -219,7 +235,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
   document
     .querySelector(".save-transaction-btn")
-    .addEventListener("click", function (event) {
+    .addEventListener("click", function(event) {
       const transactionId = event.currentTarget.getAttribute("data-id");
 
       post(
@@ -236,7 +252,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
   document
     .querySelector(".upload-receipt-btn")
-    .addEventListener("click", function (event) {
+    .addEventListener("click", function(event) {
       const transactionId = event.currentTarget.getAttribute("data-id");
       const formData = new FormData();
       const files =
@@ -260,7 +276,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
   document
     .querySelector(".import-transactions-btn")
-    .addEventListener("click", function (event) {
+    .addEventListener("click", function(event) {
       const formData = new FormData();
       const button = event.currentTarget;
       const files =
@@ -303,6 +319,12 @@ window.addEventListener("DOMContentLoaded", function () {
         }
       });
     });
+
+  document.querySelectorAll('.extraFilters').forEach(function(element) {
+    element.addEventListener("change", function(event) {
+      table.ajax.reload();
+    });
+  });
 });
 
 function getTransactionFormData(modal) {

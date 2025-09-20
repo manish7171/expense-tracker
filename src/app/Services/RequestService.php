@@ -47,7 +47,10 @@ class RequestService
       $orderBy,
       $orderDir,
       $params['search']['value'],
-      (int) $params['draw']
+      (int) $params['draw'],
+      (int) $params['transaction_year'],
+      (int) $params['transaction_month'],
+      (int) $params['transaction_category'],
     );
   }
 

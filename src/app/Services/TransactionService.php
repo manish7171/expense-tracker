@@ -24,12 +24,60 @@ class TransactionService
     return $this->update($transaction, $transactionData);
   }
 
+  public function getTotalExpense(DataTableQueryParams $params): int
+  {
+    return $this->getTotalTransactionAmount(
+      $params,
+      'expense'
+    );
+  }
+
+  public function getTotalIncome(DataTableQueryParams $params): int
+  {
+    return $this->getTotalTransactionAmount(
+      $params,
+      'income'
+    );
+  }
+
+  private  function getTotalTransactionAmount(DataTableQueryParams $params, $type): int
+  {
+    $query = $this->entityManager
+      ->getRepository(Transaction::class)
+      ->createQueryBuilder('t')
+      ->select('SUM(t.amount)')
+      ->where('t.type = :type')
+      ->setParameter('type', $type);
+    if (!empty($params->year) && !empty($params->month)) {
+      $year = $params->year;
+      $month = $params->month;
+      $start = new \DateTime("{$year}-{$month}-01");
+      $end = (clone $start)->modify('first day of next month');
+      $query->andWhere('t.date >= :start')
+        ->andWhere('t.date < :end')
+        ->setParameter('start', $start)
+        ->setParameter('end', $end);
+    } elseif (!empty($params->year) && empty($params->month)) {
+      $query->andWhere('YEAR(t.date) = :year')
+        ->setParameter('year', $params->year);
+    } elseif (!empty($params->month) && empty($params->year)) {
+      $query->andWhere('MONTH(t.date) = :month')
+        ->setParameter('month', $params->month);
+    }
+    if (!empty($params->category)) {
+      $query->andWhere('t.category = :category')
+        ->setParameter('category', $params->category);
+    }
+    $totalAmount = (int)$query->getQuery()->getSingleScalarResult();
+    return $totalAmount; // Handle null case
+  }
   public function getPaginatedTransactions(DataTableQueryParams $params): Paginator
   {
     $query = $this->entityManager
       ->getRepository(Transaction::class)
       ->createQueryBuilder('t')
       ->select('t', 'c', 'r')
+      ->where('1=1')
       ->leftJoin('t.category', 'c')
       ->leftJoin('t.receipts', 'r')
       ->setFirstResult($params->start)
@@ -41,8 +89,35 @@ class TransactionService
     $orderDir = strtolower($params->orderDir) === 'asc' ? 'asc' : 'desc';
 
     if (!empty($params->searchTerm)) {
-      $query->where('t.description LIKE :description')
+      $query->andWhere('t.description LIKE :description')
         ->setParameter('description', '%' . addcslashes($params->searchTerm, '%_') . '%');
+    }
+
+    if (!empty($params->year) && !empty($params->month)) {
+
+      $year = $params->year;
+      $month = $params->month;
+      $start = new \DateTime("{$year}-{$month}-01");
+
+      $end = (clone $start)->modify('first day of next month');
+      $query->andWhere('t.date >= :start')
+        ->andWhere('t.date < :end')
+        ->setParameter('start', $start)
+        ->setParameter('end', $end);
+    }
+    if (!empty($params->year) && empty($params->month)) {
+      $query->andWhere('YEAR(t.date) = :year')
+        ->setParameter('year', $params->year);
+    }
+
+    if (!empty($params->month) && empty($params->year)) {
+      $query->andWhere('MONTH(t.date) = :month')
+        ->setParameter('month', $params->month);
+    }
+
+    if (!empty($params->category)) {
+      $query->andWhere('t.category = :category')
+        ->setParameter('category', $params->category);
     }
 
     if ($orderBy === 'category') {

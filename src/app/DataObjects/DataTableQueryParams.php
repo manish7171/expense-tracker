@@ -12,7 +12,9 @@ class DataTableQueryParams
     public readonly string $orderBy,
     public readonly string $orderDir,
     public readonly string $searchTerm,
-    public readonly int $draw
-  ) {
-  }
+    public readonly int $draw,
+    public readonly int $year,
+    public readonly int $month,
+    public readonly int $category
+  ) {}
 }
