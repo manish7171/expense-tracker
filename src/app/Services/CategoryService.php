@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Contracts\EntityManagerServiceInterface;
-use App\DataObjects\DataTableQueryParams;
+use App\DataObjects\DataTableQueryParamsForCategory;
 use App\Entity\Category;
 use App\Entity\User;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -23,7 +23,7 @@ class CategoryService
     return $this->update($category, $name, $type);
   }
 
-  public function getPaginatedCategories(DataTableQueryParams $params): Paginator
+  public function getPaginatedCategories(DataTableQueryParamsForCategory $params): Paginator
   {
     $query = $this->entityManager
       ->getRepository(Category::class)

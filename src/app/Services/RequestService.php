@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Contracts\SessionInterface;
 use App\DataObjects\DataTableQueryParams;
+use App\DataObjects\DataTableQueryParamsForCategory;
 use Psr\Http\Message\ServerRequestInterface;
 
 class RequestService
@@ -48,9 +49,26 @@ class RequestService
       $orderDir,
       $params['search']['value'],
       (int) $params['draw'],
-      (int) $params['transaction_year'],
-      (int) $params['transaction_month'],
-      (int) $params['transaction_category'],
+      (int) ($params['transaction_year'] ?? 0),
+      (int) ($params['transaction_month'] ?? 0),
+      (int) ($params['transaction_category'] ?? 0),
+    );
+  }
+
+  public function getDataTableQueryParametersForCategory(ServerRequestInterface $request): DataTableQueryParamsForCategory
+  {
+    $params = $request->getQueryParams();
+
+    $orderBy = $params['columns'][$params['order'][0]['column']]['data'];
+    $orderDir = $params['order'][0]['dir'];
+
+    return new DataTableQueryParamsForCategory(
+      (int) $params['start'],
+      (int) $params['length'],
+      $orderBy,
+      $orderDir,
+      $params['search']['value'],
+      (int) $params['draw']
     );
   }
 

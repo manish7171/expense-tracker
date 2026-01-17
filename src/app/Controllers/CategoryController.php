@@ -72,7 +72,7 @@ class CategoryController
 
   public function load(Request $request, Response $response): Response
   {
-    $params      = $this->requestService->getDataTableQueryParameters($request);
+    $params      = $this->requestService->getDataTableQueryParametersForCategory($request);
     $categories  = $this->categoryService->getPaginatedCategories($params);
     $transformer = function (Category $category) {
       return [
