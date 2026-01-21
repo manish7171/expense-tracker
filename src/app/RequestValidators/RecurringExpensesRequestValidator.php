@@ -1,0 +1,55 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\RequestValidators;
+
+use App\Contracts\RequestValidatorInterface;
+use App\Enums\TransactionType;
+use App\Exceptions\ValidationException;
+use App\Services\CategoryService;
+use Valitron\Validator;
+
+class RecurringExpensesRequestValidator implements RequestValidatorInterface
+{
+  public function __construct(protected readonly CategoryService $categoryService) {}
+
+  public function validate(array $data): array
+  {
+    $v = new Validator($data);
+
+    $v->rule('required', ['description', 'amount', 'category', 'transaction-type'])->message('Required field');
+    $v->rule('lengthMax', 'description', 255);
+    $v->rule('in', 'transaction-type', [TransactionType::EXPENSE, TransactionType::INCOME]);
+    $v->rule('dateFormat', 'dateFormat', 'm/d/Y g:i A');
+    $v->rule('numeric', 'amount');
+    $v->rule('integer', 'category');
+    $v->rule(
+      function ($field, $value, $params, $fields) use (&$data) {
+        $id = (int) $value;
+
+        if (!$id) {
+          return false;
+        }
+
+        $category = $this->categoryService->getById($id);
+
+        if ($category) {
+          $data['category'] = $category;
+
+          return true;
+        }
+
+        return false;
+      },
+      'category'
+    )->message('Category not found');
+
+    if (!$v->validate()) {
+        var_dump($v->errors());
+        die;
+      throw new ValidationException($v->errors());
+    }
+    return $data;
+  }
+}

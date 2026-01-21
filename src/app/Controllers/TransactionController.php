@@ -11,6 +11,7 @@ use App\Entity\Receipt;
 use App\Entity\Transaction;
 use App\Enums\TransactionType;
 use App\RequestValidators\TransactionRequestValidator;
+use App\RequestValidators\RecurringExpensesRequestValidator;
 use App\ResponseFormatter;
 use App\Services\CategoryService;
 use App\Services\RequestService;
@@ -148,6 +149,123 @@ class TransactionController
     $this->transactionService->toggleReviewed($transaction);
     $this->entityManagerService->sync();
 
+    return $response;
+  }
+
+
+  public function addDefaultExpenses(Request $request, Response $response): Response
+  {
+//electricity:81; deutschland ticket angee: 59,85;Manish sim:14.99;Angee sim:6.99;rent:577.45;internet:24.89;ard radio tax:18.36
+      $data = [
+          ["description" => "Electricity", "category_id" => 9, "category" => "electricity", "price" => 81],
+          ["description" => "Deutschland ticket angee", "category_id" => 5, "category" => "transport", "price" => 59.85],
+          ["description" => "Manish sim", "category_id" => 14, "category" => "Sim Card", "price" => 14.99],
+          ["description" => "Angee sim", "category_id" => 14, "category" => "Sim Card", "price" => 6.99],
+          ["description" => "Rent", "category_id" => 8, "category" => "Rent", "price" => 577.45],
+          ["description" => "Internet", "category_id" => 10, "category" => "Internet", "price" => 24.89],
+          ["description" => "Ard radio tax", "category_id" => 15, "category" => "radio tax", "price" => 18.36],
+      ];
+
+      return $this->twig->render(
+          $response,
+          'transactions/default_expenses.twig',
+          [
+              'data' => $data,
+              'categories' => $this->categoryService->getCategoryNames()
+          ]
+      );
+
+  }
+
+  public function insertDefaultExpenses(Request $request, Response $response): Response
+  {
+      echo "STORE";
+      return $response;
+  }
+
+  public function addRecurringExpenses(Request $request, Response $response): Response
+  {
+//electricity:81; deutschland ticket angee: 59,85;Manish sim:14.99;Angee sim:6.99;rent:577.45;internet:24.89;ard radio tax:18.36
+      $data = [
+          ["description" => "Electricity", "category_id" => 9, "category" => "electricity", "price" => 81],
+          ["description" => "Deutschland ticket angee", "category_id" => 5, "category" => "transport", "price" => 59.85],
+          ["description" => "Manish sim", "category_id" => 14, "category" => "Sim Card", "price" => 14.99],
+          ["description" => "Angee sim", "category_id" => 14, "category" => "Sim Card", "price" => 6.99],
+          ["description" => "Rent", "category_id" => 8, "category" => "Rent", "price" => 577.45],
+          ["description" => "Internet", "category_id" => 10, "category" => "Internet", "price" => 24.89],
+          ["description" => "Ard radio tax", "category_id" => 15, "category" => "radio tax", "price" => 18.36],
+      ];
+
+      return $this->twig->render(
+          $response,
+          'transactions/add_recurring_expenses.twig',
+          [
+              'data' => $data,
+              'categories' => $this->categoryService->getCategoryNames()
+          ]
+      );
+
+  }
+
+  public function saveRecurringExpenses(Request $request, Response $response): Response
+  {
+    $data = $this->requestValidatorFactory->make(RecurringExpensesRequestValidator::class)->validate(
+      $request->getParsedBody()
+    );
+    $amount = $data['transaction-type'] === TransactionType::EXPENSE ? (float) (-1 * abs((float)$data['amount'])) : (float) $data['amount'];
+    $transaction = $this->transactionService->createRecurringExpense(
+      new TransactionData(
+        $data['description'],
+        $amount,
+        $data['transaction-type'],
+        new DateTime(),
+        $data['category']
+      ),
+      $request->getAttribute('user')
+    );
+
+    $this->entityManagerService->sync($transaction);
+    return $response
+        ->withHeader('Location', '/transactions/add-recurring-expenses')
+        ->withStatus(302);
+  }
+
+  public function runRecurringTransactions(Request $request, Response $response): Response
+  {
+      // get all the recurring transaction
+      $recurrings = $this->transactionService->getAllRecuringTransaction();
+      var_dump($recurrings);
+      $years = ['2024','2025','2026'];
+
+      foreach ($recurrings as $transaction) {
+
+        $category = $this->categoryService->getById($transaction['categoryId']);
+          if(empty($transaction['lastGenerated'])) {
+              // we need to enter transaciton in each month in each year
+              foreach ($years as $year) {
+                  for ($i = 1; $i <= 12; ++$i) {
+                      $m = $i < 10 ? '0'.$i: $i;
+                    $transaction = $this->transactionService->create(
+                      new TransactionData(
+                        $transaction['description'],
+                        (float)$transaction['amount'],
+                        $transaction['type'],
+                        new DateTime($year.'-'.$m.'-01'),
+                        $category
+                      ),
+                      $request->getAttribute('user')
+                    );
+                    $this->entityManagerService->sync($transaction);
+                    die;
+                  }
+              }
+          }
+      }
+      // check last recuring date for each
+      // if monthly, check current month with last updated month
+      // if last updated month is not defined then its the first run so run for all year and month till this month
+      // TODO: we need to do this with incomes as well
+    echo "Run"; 
     return $response;
   }
 }

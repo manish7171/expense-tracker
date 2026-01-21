@@ -8,7 +8,9 @@ use App\Contracts\EntityManagerServiceInterface;
 use App\DataObjects\DataTableQueryParams;
 use App\DataObjects\TransactionData;
 use App\Entity\Transaction;
+use App\Entity\RecurringTransaction;
 use App\Entity\User;
+use App\Enums\FrequencyType;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class TransactionService
@@ -22,6 +24,15 @@ class TransactionService
     $transaction->setUser($user);
 
     return $this->update($transaction, $transactionData);
+  }
+
+  public function createRecurringExpense(TransactionData $transactionData, User $user): RecurringTransaction
+  {
+    $transaction = new RecurringTransaction();
+
+    $transaction->setUser($user);
+
+    return $this->updateRecurringTransaction($transaction, $transactionData);
   }
 
   public function getTotalExpense(DataTableQueryParams $params): int
@@ -145,6 +156,16 @@ class TransactionService
     return $transaction;
   }
 
+  public function updateRecurringTransaction(RecurringTransaction $transaction, TransactionData $transactionData): RecurringTransaction
+  {
+    $transaction->setDescription($transactionData->description);
+    $transaction->setAmount($transactionData->amount);
+    $transaction->setCategory($transactionData->category);
+    $transaction->setTransactionType($transactionData->type);
+    $transaction->setFrequency(FrequencyType::Monthly);
+    return $transaction;
+  }
+
   public function toggleReviewed(Transaction $transaction): void
   {
     $transaction->setReviewed(!$transaction->wasReviewed());
@@ -192,5 +213,15 @@ class TransactionService
     $query->setParameter('year', $year);
 
     return $query->getArrayResult();
+  }
+
+  public function getAllRecuringTransaction(): array
+  {
+    return $this->entityManager
+      ->getRepository(RecurringTransaction::class)
+      ->createQueryBuilder('t')
+      ->select('t')
+      ->getQuery()
+      ->getArrayResult();
   }
 }

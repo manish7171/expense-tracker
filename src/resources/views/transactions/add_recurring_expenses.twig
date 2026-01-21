@@ -1,0 +1,63 @@
+{% extends 'layout.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('transactions') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('transactions') }}
+{% endblock %}
+
+{% block title %}Transactions{% endblock %}
+
+{% block content %}
+    <div class="transactions container content-body">
+        <form method="POST" action="/transactions/add-recurring-expenses" class="form">
+
+        <input type="hidden" id="csrfName" name="{{ csrf.keys.name }}" value="{{ csrf.name }}">
+        <input type="hidden" id="csrfValue" name="{{ csrf.keys.value }}" value="{{ csrf.value }}">
+
+            <div class="form-outline form-white mb-4">
+                      <select name="category" class="form-select extraFilters" id="categoryFilter">
+                          <option value="">All Categories</option>
+                          {% for category in categories %}
+                              <option value="{{ category.id }}">{{ category.name }}</option>
+                          {% endfor %}
+                      </select>
+            </div>
+        <div class="form-outline form-white mb-4">
+        <label for="yearFilter" class="form-label fw-semibold">
+        <i class="fas fa-calendar-alt text-primary"></i> Type
+        </label>
+        <select name="transaction-type" class="form-select extraFilters" id="frequency">
+                          <option value="expense" selected>Expense</option>
+                          <option value="income">Income</option>
+        </select>
+        </div>
+        <div class="form-outline form-white mb-4">
+        <label for="yearFilter" class="form-label fw-semibold">
+        <i class="fas fa-calendar-alt text-primary"></i> Frequency
+        </label>
+        <select name="frequency" class="form-select extraFilters" id="frequency">
+                          <option value="daily">Daily</option>
+                          <option value="monthly" selected>Monthly</option>
+                          <option value="yearly">Yearly</option>
+        </select>
+        </div>
+            <div class="form-outline form-white mb-4">
+                <input type="text" value="" name="description" required
+                    class="form-control form-control-lg"
+                    placeholder="Description" />
+            </div>
+            <div class="form-outline form-white mb-4">
+                <input type="text" value="" name="amount" required
+                    class="form-control form-control-lg"
+                    placeholder="price" />
+            </div>
+
+            <input type="submit" name"submit" value="submit"/>
+        </form>
+    </div>
+{% endblock %}
