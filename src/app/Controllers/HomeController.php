@@ -8,6 +8,7 @@ use App\ResponseFormatter;
 use App\Services\CategoryService;
 use App\Services\TransactionService;
 use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
 
 class HomeController
@@ -39,9 +40,12 @@ class HomeController
     );
   }
 
-  public function getYearToDateStatistics(Response $response): Response
+  public function getYearToDateStatistics(Request $request, Response $response): Response
   {
-    $data = $this->transactionService->getMonthlySummary((int) date('Y'));
+    //$data = $this->transactionService->getMonthlySummary((int) date('Y'));
+    $params = $request->getQueryParams();
+    $year = $params['year']??date('Y');
+    $data = $this->transactionService->getMonthlySummary((int)$year);
 
     return $this->responseFormatter->asJson($response, $data);
   }

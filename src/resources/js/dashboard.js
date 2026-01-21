@@ -3,9 +3,19 @@ import Chart from "chart.js/auto";
 import { get } from "./ajax";
 
 window.addEventListener("DOMContentLoaded", function () {
+document.getElementById("selected-year").addEventListener("change", function() {
+    localStorage.setItem("selectValue", this.value);
+    location.reload();
+});
   const ctx = document.getElementById("yearToDateChart");
-
-  get("/stats/ytd")
+  let yearSelect = document.getElementById("selected-year");
+  let year = yearSelect.value;
+  const savedValue = localStorage.getItem("selectValue");
+    if (savedValue) {
+        year = savedValue;
+        yearSelect.value = savedValue;
+    } 
+  get("/stats/ytd?year="+year)
     .then((response) => response.json())
     .then((response) => {
       let expensesData = Array(12).fill(null);
