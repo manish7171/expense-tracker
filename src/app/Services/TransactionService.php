@@ -215,7 +215,7 @@ class TransactionService
     return $query->getArrayResult();
   }
 
-  public function getAllRecuringTransaction(): array
+  public function getAllRecurringTransaction(): array
   {
     return $this->entityManager
       ->getRepository(RecurringTransaction::class)
@@ -223,5 +223,17 @@ class TransactionService
       ->select('t')
       ->getQuery()
       ->getArrayResult();
+  }
+
+  public function updateLastGenerateColumn(int $transactionId): void
+  {
+    $this->entityManager->createQuery(
+        'UPDATE App\Entity\RecurringTransaction rt 
+         SET rt.lastGenerated = :date 
+         WHERE rt.id = :id'
+    )
+    ->setParameter('date', new \DateTime())
+    ->setParameter('id', $transactionId)
+    ->execute();
   }
 }
