@@ -234,27 +234,66 @@ class TransactionController
         // if monthly, check current month with last updated month
         // if last updated month is not defined then its the first run so run for all year and month till this month
         // TODO: we need to do this with incomes as well
-        echo "Run";
+        echo "Run1";
         $recurrings = $this->transactionService->getAllRecurringTransaction();
-        $years = [2024, 2025];
+        $years = [(int)date('Y')];
+        var_dump($years);
         $user = $request->getAttribute('user');
         $batchSize = 20;
         $count = 0;
 
         foreach ($recurrings as $recurring) {
-            echo "===Recurring transaction ".$recurring['description'] ."<br><br>";
+            echo "===Recurring transaction " . $recurring['description'] . "<br><br>";
+            $category = $this->categoryService->getById($recurring['categoryId']);
             if (!empty($recurring['lastGenerated'])) {
-                continue;
-            }
+                //TODO: differece between lastGenerated and Today
+                var_dump($recurring['lastGenerated']);
+                $givenDate = $recurring['lastGenerated'];
+                $today     = new DateTime();
 
+                // Normalize both to the first day of their months
+                $givenMonth = (clone $givenDate)->modify('first day of this month');
+                $todayMonth = (clone $today)->modify('first day of this month');
+
+                $diff = $givenMonth->diff($todayMonth);
+
+                // Total months passed
+                $monthsPassed = ($diff->y * 12) + $diff->m;
+
+                echo $monthsPassed . ' month passed<br>';
+
+                if ($monthsPassed === 0) continue;
+
+                for ($i = 1; $i <= $monthsPassed; $i++) {
+                    $givenDate->modify('+1 month');
+                    echo $givenDate->format('Y-m-d'); // 2026-01-25
+                    echo '<br>';
+                    $transaction = $this->transactionService->create(
+                        new TransactionData(
+                            $recurring['description'],
+                            (float) $recurring['amount'],
+                            $recurring['type'],
+                            $givenDate,
+                            $category
+                        ),
+                        $user
+                    );
+                    $this->entityManagerService->sync($transaction);
+                }
+            echo "      update Recurring laste generated <br>";
+            $this->transactionService->updateLastGenerateColumn($recurring['id']);
+            echo "===Recurring ends <br><br>";
+            }
+        }
+        /*die;
             $category = $this->categoryService->getById($recurring['categoryId']);
 
             foreach ($years as $year) {
                 for ($month = 1; $month <= 12; $month++) {
                     $date = new DateTime(sprintf('%d-%02d-01', $year, $month));
-                    
-                    echo "      Recurring transaction ".$date->format('Y-m-d') ."<br>";
-                    if ($year === 2025 && in_array($month, [1,2,3,4]) && $recurring['categoryId'] == 16) {
+
+                    echo "      Recurring transaction " . $date->format('Y-m-d') . "<br>";
+                    if ($year === 2025 && in_array($month, [1, 2, 3, 4]) && $recurring['categoryId'] == 16) {
                         continue;
                     }
                     $transaction = $this->transactionService->create(
@@ -275,7 +314,7 @@ class TransactionController
             echo "      update Recurring laste generated <br>";
             $this->transactionService->updateLastGenerateColumn($recurring['id']);
             echo "===Recurring ends <br><br>";
-        }
+        }*/
 
         // Flush remaining entities
         $this->entityManagerService->flush();
