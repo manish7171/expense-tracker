@@ -15,192 +15,192 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class TransactionService
 {
-  public function __construct(private readonly EntityManagerServiceInterface $entityManager) {}
+    public function __construct(private readonly EntityManagerServiceInterface $entityManager) {}
 
-  public function create(TransactionData $transactionData, User $user): Transaction
-  {
-    $transaction = new Transaction();
+    public function create(TransactionData $transactionData, User $user): Transaction
+    {
+        $transaction = new Transaction();
 
-    $transaction->setUser($user);
+        $transaction->setUser($user);
 
-    return $this->update($transaction, $transactionData);
-  }
-
-  public function createRecurringExpense(TransactionData $transactionData, User $user): RecurringTransaction
-  {
-    $transaction = new RecurringTransaction();
-
-    $transaction->setUser($user);
-
-    return $this->updateRecurringTransaction($transaction, $transactionData);
-  }
-
-  public function getTotalExpense(DataTableQueryParams $params): int
-  {
-    return $this->getTotalTransactionAmount(
-      $params,
-      'expense'
-    );
-  }
-
-  public function getTotalIncome(DataTableQueryParams $params): int
-  {
-    return $this->getTotalTransactionAmount(
-      $params,
-      'income'
-    );
-  }
-
-  private  function getTotalTransactionAmount(DataTableQueryParams $params, $type): int
-  {
-    $query = $this->entityManager
-      ->getRepository(Transaction::class)
-      ->createQueryBuilder('t')
-      ->select('SUM(t.amount)')
-      ->where('t.type = :type')
-      ->setParameter('type', $type);
-    if (!empty($params->year) && !empty($params->month)) {
-      $year = $params->year;
-      $month = $params->month;
-      $start = new \DateTime("{$year}-{$month}-01");
-      $end = (clone $start)->modify('first day of next month');
-      $query->andWhere('t.date >= :start')
-        ->andWhere('t.date < :end')
-        ->setParameter('start', $start)
-        ->setParameter('end', $end);
-    } elseif (!empty($params->year) && empty($params->month)) {
-      $query->andWhere('YEAR(t.date) = :year')
-        ->setParameter('year', $params->year);
-    } elseif (!empty($params->month) && empty($params->year)) {
-      $query->andWhere('MONTH(t.date) = :month')
-        ->setParameter('month', $params->month);
-    }
-    if (!empty($params->category)) {
-      $query->andWhere('t.category = :category')
-        ->setParameter('category', $params->category);
-    }
-    $totalAmount = (int)$query->getQuery()->getSingleScalarResult();
-    return $totalAmount; // Handle null case
-  }
-  public function getPaginatedTransactions(DataTableQueryParams $params): Paginator
-  {
-    $query = $this->entityManager
-      ->getRepository(Transaction::class)
-      ->createQueryBuilder('t')
-      ->select('t', 'c', 'r')
-      ->where('1=1')
-      ->leftJoin('t.category', 'c')
-      ->leftJoin('t.receipts', 'r')
-      ->setFirstResult($params->start)
-      ->setMaxResults($params->length);
-
-    $orderBy  = in_array($params->orderBy, ['description', 'amount', 'date', 'category'])
-      ? $params->orderBy
-      : 'date';
-    $orderDir = strtolower($params->orderDir) === 'asc' ? 'asc' : 'desc';
-
-    if (!empty($params->searchTerm)) {
-      $query->andWhere('t.description LIKE :description')
-        ->setParameter('description', '%' . addcslashes($params->searchTerm, '%_') . '%');
+        return $this->update($transaction, $transactionData);
     }
 
-    if (!empty($params->year) && !empty($params->month)) {
+    public function createRecurringExpense(TransactionData $transactionData, User $user): RecurringTransaction
+    {
+        $transaction = new RecurringTransaction();
 
-      $year = $params->year;
-      $month = $params->month;
-      $start = new \DateTime("{$year}-{$month}-01");
+        $transaction->setUser($user);
 
-      $end = (clone $start)->modify('first day of next month');
-      $query->andWhere('t.date >= :start')
-        ->andWhere('t.date < :end')
-        ->setParameter('start', $start)
-        ->setParameter('end', $end);
-    }
-    if (!empty($params->year) && empty($params->month)) {
-      $query->andWhere('YEAR(t.date) = :year')
-        ->setParameter('year', $params->year);
+        return $this->updateRecurringTransaction($transaction, $transactionData);
     }
 
-    if (!empty($params->month) && empty($params->year)) {
-      $query->andWhere('MONTH(t.date) = :month')
-        ->setParameter('month', $params->month);
+    public function getTotalExpense(DataTableQueryParams $params): int
+    {
+        return $this->getTotalTransactionAmount(
+            $params,
+            'expense'
+        );
     }
 
-    if (!empty($params->category)) {
-      $query->andWhere('t.category = :category')
-        ->setParameter('category', $params->category);
+    public function getTotalIncome(DataTableQueryParams $params): int
+    {
+        return $this->getTotalTransactionAmount(
+            $params,
+            'income'
+        );
     }
 
-    if ($orderBy === 'category') {
-      $query->orderBy('c.name', $orderDir);
-    } else {
-      $query->orderBy('t.' . $orderBy, $orderDir);
+    private  function getTotalTransactionAmount(DataTableQueryParams $params, $type): int
+    {
+        $query = $this->entityManager
+            ->getRepository(Transaction::class)
+            ->createQueryBuilder('t')
+            ->select('SUM(t.amount)')
+            ->where('t.type = :type')
+            ->setParameter('type', $type);
+        if (!empty($params->year) && !empty($params->month)) {
+            $year = $params->year;
+            $month = $params->month;
+            $start = new \DateTime("{$year}-{$month}-01");
+            $end = (clone $start)->modify('first day of next month');
+            $query->andWhere('t.date >= :start')
+                ->andWhere('t.date < :end')
+                ->setParameter('start', $start)
+                ->setParameter('end', $end);
+        } elseif (!empty($params->year) && empty($params->month)) {
+            $query->andWhere('YEAR(t.date) = :year')
+                ->setParameter('year', $params->year);
+        } elseif (!empty($params->month) && empty($params->year)) {
+            $query->andWhere('MONTH(t.date) = :month')
+                ->setParameter('month', $params->month);
+        }
+        if (!empty($params->category)) {
+            $query->andWhere('t.category = :category')
+                ->setParameter('category', $params->category);
+        }
+        $totalAmount = (int)$query->getQuery()->getSingleScalarResult();
+        return $totalAmount; // Handle null case
+    }
+    public function getPaginatedTransactions(DataTableQueryParams $params): Paginator
+    {
+        $query = $this->entityManager
+            ->getRepository(Transaction::class)
+            ->createQueryBuilder('t')
+            ->select('t', 'c', 'r')
+            ->where('1=1')
+            ->leftJoin('t.category', 'c')
+            ->leftJoin('t.receipts', 'r')
+            ->setFirstResult($params->start)
+            ->setMaxResults($params->length);
+
+        $orderBy  = in_array($params->orderBy, ['description', 'amount', 'date', 'category'])
+            ? $params->orderBy
+            : 'date';
+        $orderDir = strtolower($params->orderDir) === 'asc' ? 'asc' : 'desc';
+
+        if (!empty($params->searchTerm)) {
+            $query->andWhere('t.description LIKE :description')
+                ->setParameter('description', '%' . addcslashes($params->searchTerm, '%_') . '%');
+        }
+
+        if (!empty($params->year) && !empty($params->month)) {
+
+            $year = $params->year;
+            $month = $params->month;
+            $start = new \DateTime("{$year}-{$month}-01");
+
+            $end = (clone $start)->modify('first day of next month');
+            $query->andWhere('t.date >= :start')
+                ->andWhere('t.date < :end')
+                ->setParameter('start', $start)
+                ->setParameter('end', $end);
+        }
+        if (!empty($params->year) && empty($params->month)) {
+            $query->andWhere('YEAR(t.date) = :year')
+                ->setParameter('year', $params->year);
+        }
+
+        if (!empty($params->month) && empty($params->year)) {
+            $query->andWhere('MONTH(t.date) = :month')
+                ->setParameter('month', $params->month);
+        }
+
+        if (!empty($params->category)) {
+            $query->andWhere('t.category = :category')
+                ->setParameter('category', $params->category);
+        }
+
+        if ($orderBy === 'category') {
+            $query->orderBy('c.name', $orderDir);
+        } else {
+            $query->orderBy('t.' . $orderBy, $orderDir);
+        }
+
+        return new Paginator($query);
     }
 
-    return new Paginator($query);
-  }
+    public function getById(int $id): ?Transaction
+    {
+        return $this->entityManager->find(Transaction::class, $id);
+    }
 
-  public function getById(int $id): ?Transaction
-  {
-    return $this->entityManager->find(Transaction::class, $id);
-  }
+    public function update(Transaction $transaction, TransactionData $transactionData): Transaction
+    {
+        $transaction->setDescription($transactionData->description);
+        $transaction->setAmount($transactionData->amount);
+        $transaction->setDate($transactionData->date);
+        $transaction->setCategory($transactionData->category);
+        $transaction->setTransactionType($transactionData->type);
 
-  public function update(Transaction $transaction, TransactionData $transactionData): Transaction
-  {
-    $transaction->setDescription($transactionData->description);
-    $transaction->setAmount($transactionData->amount);
-    $transaction->setDate($transactionData->date);
-    $transaction->setCategory($transactionData->category);
-    $transaction->setTransactionType($transactionData->type);
+        return $transaction;
+    }
 
-    return $transaction;
-  }
+    public function updateRecurringTransaction(RecurringTransaction $transaction, TransactionData $transactionData): RecurringTransaction
+    {
+        $transaction->setDescription($transactionData->description);
+        $transaction->setAmount($transactionData->amount);
+        $transaction->setCategory($transactionData->category);
+        $transaction->setTransactionType($transactionData->type);
+        $transaction->setFrequency(FrequencyType::Monthly);
+        return $transaction;
+    }
 
-  public function updateRecurringTransaction(RecurringTransaction $transaction, TransactionData $transactionData): RecurringTransaction
-  {
-    $transaction->setDescription($transactionData->description);
-    $transaction->setAmount($transactionData->amount);
-    $transaction->setCategory($transactionData->category);
-    $transaction->setTransactionType($transactionData->type);
-    $transaction->setFrequency(FrequencyType::Monthly);
-    return $transaction;
-  }
+    public function toggleReviewed(Transaction $transaction): void
+    {
+        $transaction->setReviewed(!$transaction->wasReviewed());
+    }
 
-  public function toggleReviewed(Transaction $transaction): void
-  {
-    $transaction->setReviewed(!$transaction->wasReviewed());
-  }
-
-  public function getTotals(\DateTime $startDate, \DateTime $endDate): array
-  {
-    $query = $this->entityManager->createQuery(
-      'SELECT COALESCE(SUM(t.amount), 0) AS net, 
+    public function getTotals(\DateTime $startDate, \DateTime $endDate): array
+    {
+        $query = $this->entityManager->createQuery(
+            'SELECT COALESCE(SUM(t.amount), 0) AS net, 
                     COALESCE(SUM(CASE WHEN t.amount > 0 THEN t.amount ELSE 0 END), 0) AS income,
                     COALESCE(SUM(CASE WHEN t.amount < 0 THEN ABS(t.amount) ELSE 0 END), 0) as expense
              FROM App\Entity\Transaction t
              WHERE t.date BETWEEN :start AND :end'
-    );
-    $query->setParameter('start', $startDate->format('Y-m-d 00:00:00'));
-    $query->setParameter('end', $endDate->format('Y-m-d 23:59:59'));
-    return ($query->getSingleResult());
-  }
+        );
+        $query->setParameter('start', $startDate->format('Y-m-d 00:00:00'));
+        $query->setParameter('end', $endDate->format('Y-m-d 23:59:59'));
+        return ($query->getSingleResult());
+    }
 
-  public function getRecentTransactions(int $limit): array
-  {
-    return $this->entityManager
-      ->getRepository(Transaction::class)
-      ->createQueryBuilder('t')
-      ->select('t', 'c')
-      ->leftJoin('t.category', 'c')
-      ->orderBy('t.date', 'desc')
-      ->setMaxResults($limit)
-      ->getQuery()
-      ->getArrayResult();
-  }
+    public function getRecentTransactions(int $limit): array
+    {
+        return $this->entityManager
+            ->getRepository(Transaction::class)
+            ->createQueryBuilder('t')
+            ->select('t', 'c')
+            ->leftJoin('t.category', 'c')
+            ->orderBy('t.date', 'desc')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getArrayResult();
+    }
 
-  public function getMonthlySummary(int $year): array
-  {
-    $query = $this->entityManager->createQuery(
+    public function getMonthlySummary(int $year): array
+    {
+        /*$query = $this->entityManager->createQuery(
       'SELECT SUM(CASE WHEN t.amount > 0 THEN t.amount ELSE 0 END) as income,
                     SUM(CASE WHEN t.amount < 0 THEN abs(t.amount) ELSE 0 END) as expense, 
                     MONTH(t.date) as m
@@ -208,32 +208,107 @@ class TransactionService
              WHERE YEAR(t.date) = :year 
              GROUP BY m 
              ORDER BY m ASC'
-    );
+    );*/
 
-    $query->setParameter('year', $year);
+        /*$query = $this->entityManager->createQuery(
+        'SELECT
+            Month(t.date) as md,
+            c.name AS category,
+            SUM(t.amount) AS category_total,
+            m.month_total as month_total
+        FROM
+            App\Entity\Transaction  t
+        JOIN App\Entity\Category c ON
+            t.category_id = c.id
+        join(
+            SELECT Month(date) AS month, SUM(amount) AS month_total FROM App\Entity\Transaction as t WHERE YEAR(t.date) = :year group by month
+        ) m ON
+        Month(t.date) = m.month
+        WHERE
+            YEAR(t.date) = :year
+        GROUP BY
+            md,
+            t.category_id,
+            m.month_total
+        ORDER BY
+            md;' 
+    );*/
+        $monthlyTotals = $this->entityManager->createQuery(
+            'SELECT
+        MONTH(t.date) AS month,
+        SUM(t.amount) AS month_total
+     FROM App\Entity\Transaction t
+     WHERE YEAR(t.date) = :year
+     GROUP BY month'
+        )
+            ->setParameter('year', $year)
+            ->getArrayResult();
 
-    return $query->getArrayResult();
-  }
+        $categoryTotals = $this->entityManager->createQuery(
+            'SELECT
+        MONTH(t.date) AS month,
+        t.type as type,
+        c.name AS category,
+        SUM(t.amount) AS category_total
+     FROM App\Entity\Transaction t
+     JOIN t.category c
+     WHERE YEAR(t.date) = :year
+     GROUP BY month, c.id , t.type'
+        )
+            ->setParameter('year', $year)
+            ->getArrayResult();
+        
+        $monthMap = [];
+        foreach ($monthlyTotals as $m) {
+            $monthMap[$m['month']] = $m['month_total'];
+        }
 
-  public function getAllRecurringTransaction(): array
-  {
-    return $this->entityManager
-      ->getRepository(RecurringTransaction::class)
-      ->createQueryBuilder('t')
-      ->select('t')
-      ->getQuery()
-      ->getArrayResult();
-  }
+        foreach ($monthlyTotals as &$m) {
+            $m['expense_total'] = round(abs(array_sum(array_map(function($t) use ($m){
+                if (($t['month'] == $m['month']) && ($t['type'] === 'expense')) {
+                    return $t['category_total'];
+                } 
+            },$categoryTotals)
+            )),2);
+            $m['all_expenses'] = array_map(function($f) {
+                return [$f['category'] => $f['category_total']];
+            },array_values(array_filter($categoryTotals, function($t) use ($m){
+                return (($t['month'] == $m['month']) && ($t['type'] === 'expense'));
+            })));
+            $m['all_incomes'] = array_map(function($f) {
+                return [$f['category'] => $f['category_total']];
+            },array_values(array_filter($categoryTotals, function($t) use ($m){
+                return (($t['month'] == $m['month']) && ($t['type'] === 'income'));
+            })));
+            $m['income_total'] = round(array_sum(array_map(function($t) use ($m){
+                if (($t['month'] == $m['month']) && ($t['type'] === 'income')) {
+                    return $t['category_total'];
+                } 
+            },$categoryTotals)
+            ), 2);
+        }
+        return $monthlyTotals;
+    }
 
-  public function updateLastGenerateColumn(int $transactionId): void
-  {
-    $this->entityManager->createQuery(
-        'UPDATE App\Entity\RecurringTransaction rt 
+    public function getAllRecurringTransaction(): array
+    {
+        return $this->entityManager
+            ->getRepository(RecurringTransaction::class)
+            ->createQueryBuilder('t')
+            ->select('t')
+            ->getQuery()
+            ->getArrayResult();
+    }
+
+    public function updateLastGenerateColumn(int $transactionId): void
+    {
+        $this->entityManager->createQuery(
+            'UPDATE App\Entity\RecurringTransaction rt 
          SET rt.lastGenerated = :date 
          WHERE rt.id = :id'
-    )
-    ->setParameter('date', new \DateTime())
-    ->setParameter('id', $transactionId)
-    ->execute();
-  }
+        )
+            ->setParameter('date', new \DateTime())
+            ->setParameter('id', $transactionId)
+            ->execute();
+    }
 }

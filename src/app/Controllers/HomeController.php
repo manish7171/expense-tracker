@@ -42,7 +42,6 @@ class HomeController
 
   public function getYearToDateStatistics(Request $request, Response $response): Response
   {
-    //$data = $this->transactionService->getMonthlySummary((int) date('Y'));
     $params = $request->getQueryParams();
     $year = $params['year']??date('Y');
     $data = $this->transactionService->getMonthlySummary((int)$year);

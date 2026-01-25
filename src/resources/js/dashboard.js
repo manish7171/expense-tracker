@@ -19,11 +19,22 @@ document.getElementById("selected-year").addEventListener("change", function() {
     .then((response) => response.json())
     .then((response) => {
       let expensesData = Array(12).fill(null);
+      let expensesDetailData = Array(12).fill(null);
+      let incomeDetailData = Array(12).fill(null);
       let incomeData = Array(12).fill(null);
 
-      response.forEach(({ m, expense, income }) => {
-        expensesData[m - 1] = expense;
-        incomeData[m - 1] = income;
+      response.forEach(({ month, month_total, expense_total, all_expenses, all_incomes, income_total }) => {
+        expensesData[month - 1] = expense_total;
+        expensesDetailData[month - 1] = all_expenses.map(obj => {
+            const [key, value] = Object.entries(obj)[0];
+            return `${key}: ${Math.abs(parseFloat(value))}`;
+        });
+        incomeDetailData[month - 1] = all_incomes.map(obj => {
+            const [key, value] = Object.entries(obj)[0];
+            return `${key}: ${Math.abs(parseFloat(value))}`;
+        });
+
+        incomeData[month - 1] = income_total;
       });
 
       new Chart(ctx, {
@@ -47,6 +58,7 @@ document.getElementById("selected-year").addEventListener("change", function() {
             {
               label: "Expense",
               data: expensesData,
+              extraData: expensesDetailData,
               borderWidth: 1,
               backgroundColor: "rgba(255, 99, 132, 0.2)",
               borderColor: "rgba(255, 99, 132, 1)",
@@ -54,6 +66,7 @@ document.getElementById("selected-year").addEventListener("change", function() {
             {
               label: "Income",
               data: incomeData,
+              extraData: incomeDetailData,
               borderWidth: 1,
               backgroundColor: "rgba(75, 192, 192, 0.2)",
               borderColor: "rgba(75, 192, 192, 1)",
@@ -66,6 +79,21 @@ document.getElementById("selected-year").addEventListener("change", function() {
               beginAtZero: true,
             },
           },
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  const value = context.raw;
+                  const label = context.dataset.label
+                  const extra = context.dataset.extraData[context.dataIndex];
+                  return [
+                    `${label}: ${value}`,
+                      ...extra
+                  ];
+                }
+              }
+            }
+          }
         },
       });
     });
