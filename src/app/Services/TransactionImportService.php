@@ -22,19 +22,25 @@ class TransactionImportService
   {
     $resource   = fopen($file, 'r');
     $categories = $this->categoryService->getAllKeyedByName();
-    fgetcsv($resource);
+    //fgetcsv($resource);
 
     $count     = 1;
     $batchSize = 250;
     while (($row = fgetcsv($resource)) !== false) {
-      [$date, $description, $category, $amount] = $row;
-
+      [$date, $amount, $description, $category] = $row;
       $date     = new \DateTime($date);
       $category = $categories[strtolower($category)] ?? null;
       $amount   = str_replace(['$', ','], '', $amount);
 
-      $transactionData = new TransactionData($description, (float) $amount, $date, $category);
+      //$transactionData = new TransactionData($description, (float) $amount, $date, $category);
 
+      $transactionData = new TransactionData(
+          $description,
+          (float)$amount,
+          'expense',
+          $date,
+          $category
+      );
       $this->entityManagerService->persist(
         $this->transactionService->create($transactionData, $user)
       );

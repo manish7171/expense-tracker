@@ -38,6 +38,7 @@ return function (App $app) {
       $transactions->get('/load', [TransactionController::class, 'load']);
       $transactions->post('', [TransactionController::class, 'store']);
       $transactions->post('/import', [TransactionImporterController::class, 'import']);
+      $transactions->get('/format-raw', [TransactionImporterController::class, 'formatRaw']);
       $transactions->get('/add-default-expenses', [TransactionController::class, 'addDefaultExpenses'])->setName('transactions');
       $transactions->post('/add-default-expenses', [TransactionController::class, 'insertDefaultExpenses'])->setName('transactions');
       $transactions->get('/add-recurring-expenses', [TransactionController::class, 'addRecurringExpenses']);
