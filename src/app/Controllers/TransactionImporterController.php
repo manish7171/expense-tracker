@@ -65,6 +65,7 @@ class TransactionImporterController
       }
       fclose($file);
       foreach($result as $r){
+          var_dump($r);
           [$date, $price, $description] = preg_split('/\s+/', $r, 3);
           file_put_contents($rfile, "$date,$price,$description\n", FILE_APPEND);
       }
